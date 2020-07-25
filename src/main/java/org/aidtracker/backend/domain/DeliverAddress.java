@@ -1,4 +1,4 @@
-package org.aidtracker.backend.entity;
+package org.aidtracker.backend.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

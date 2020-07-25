@@ -1,4 +1,4 @@
-package org.aidtracker.backend.entity;
+package org.aidtracker.backend.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,10 +30,10 @@ public class Goods {
     /**
      * 制造商
      */
-    private String manufacturer;
+    private String goodsManufacturer;
 
     /**
      * 单位 双/枚/箱...
      */
-    private String unit;
+    private String goodsUnit;
 }

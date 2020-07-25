@@ -1,0 +1,11 @@
+package org.aidtracker.backend.dao;
+
+import org.aidtracker.backend.domain.account.Account;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+/**
+ * @author mtage
+ * @since 2020/7/25 12:48
+ */
+public interface AccountRepository extends JpaRepository<Account, Long> {
+}

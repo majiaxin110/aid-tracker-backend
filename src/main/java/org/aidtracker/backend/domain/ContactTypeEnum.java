@@ -1,4 +1,4 @@
-package org.aidtracker.backend.entity;
+package org.aidtracker.backend.domain;
 
 /**
  * @author mtage
