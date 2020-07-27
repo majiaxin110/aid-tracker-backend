@@ -25,7 +25,7 @@ public class SupplyProjectLog {
     private long supplyProjectId;
 
     @Enumerated(EnumType.STRING)
-    private SupplyProjectLogTypeEnum type;
+    private SupplyProjectLogTypeEnum logType;
 
     private ZonedDateTime time;
 

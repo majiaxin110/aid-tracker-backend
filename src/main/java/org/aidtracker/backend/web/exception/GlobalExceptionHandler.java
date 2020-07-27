@@ -6,7 +6,7 @@ import org.aidtracker.backend.util.AidTrackerCommonErrorCode;
 import org.aidtracker.backend.util.CommonBizException;
 import org.aidtracker.backend.util.CommonSysException;
 import org.aidtracker.backend.util.SimpleResult;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -53,7 +53,7 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public SimpleResult<?> handleInvalidParameterException(InvalidParameterException ex) throws UnknownHostException {
         Throwable rootCause = ExceptionUtils.getRootCause(ex);
-        SimpleResult<Map<Object, Object>> simpleResult = SimpleResult.fail(AidTrackerCommonErrorCode.INVALID_PARAM.name(),
+        SimpleResult<Map<Object, Object>> simpleResult = SimpleResult.fail(AidTrackerCommonErrorCode.INVALID_PARAM.getErrorCode(),
                 MessageFormat.format("{0} rootCauseMsg: {1} Host: {2}",
                         ex.getMessage(), rootCause.getMessage(), InetAddress.getLocalHost().getHostName()));
         simpleResult.setResult(Maps.newHashMap());

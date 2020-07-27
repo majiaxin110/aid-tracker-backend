@@ -1,5 +1,7 @@
 package org.aidtracker.backend.util;
 
+import lombok.Getter;
+
 /**
  * @author mtage
  * @since 2020/7/27 11:01
@@ -27,6 +29,7 @@ public enum AidTrackerCommonErrorCode {
 
     ;
 
+    @Getter
     private String errorCode;
 
     AidTrackerCommonErrorCode(String errorCode) {

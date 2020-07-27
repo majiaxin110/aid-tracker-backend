@@ -1,5 +1,6 @@
 package org.aidtracker.backend.domain.supply;
 
+import lombok.Data;
 import org.aidtracker.backend.domain.Contact;
 
 import javax.persistence.*;
@@ -12,6 +13,7 @@ import javax.persistence.*;
 @Table(indexes = {
         @Index(name = "idx_supplyid", columnList = "supplyProjectId")
 })
+@Data
 public class DeliverPeriod {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,7 +23,7 @@ public class DeliverPeriod {
     private long supplyProjectId;
 
     @Enumerated(EnumType.STRING)
-    private DeliverPeriodTypeEnum type;
+    private DeliverPeriodTypeEnum periodType;
 
     /**
      * 物流单号

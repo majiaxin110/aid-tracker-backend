@@ -1,10 +1,6 @@
 package org.aidtracker.backend.web.dto;
 
 import lombok.Data;
-import org.aidtracker.backend.domain.ContactTypeEnum;
-
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 
 /**
  * 新用户注册请求
