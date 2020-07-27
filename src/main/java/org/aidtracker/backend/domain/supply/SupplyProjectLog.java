@@ -1,8 +1,10 @@
 package org.aidtracker.backend.domain.supply;
 
+import lombok.Data;
 import org.aidtracker.backend.dao.util.SimpleStringListConverter;
 
 import javax.persistence.*;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 /**
@@ -13,6 +15,7 @@ import java.util.List;
 @Table(indexes = {
         @Index(name = "idx_supplyid", columnList = "supplyProjectId")
 })
+@Data
 public class SupplyProjectLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,6 +26,10 @@ public class SupplyProjectLog {
 
     @Enumerated(EnumType.STRING)
     private SupplyProjectLogTypeEnum type;
+
+    private ZonedDateTime time;
+
+    private String info;
 
     @Convert(converter = SimpleStringListConverter.class)
     private List<String> fileIds;
