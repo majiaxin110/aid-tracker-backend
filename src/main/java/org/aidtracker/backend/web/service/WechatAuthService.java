@@ -3,6 +3,7 @@ package org.aidtracker.backend.web.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.aidtracker.backend.util.AidTrackerCommonErrorCode;
 import org.aidtracker.backend.util.CommonSysException;
@@ -24,16 +25,16 @@ import java.net.URI;
 @ConfigurationProperties(prefix = "wechat.auth")
 @Slf4j
 public class WechatAuthService {
-    @Value("url")
+    @Setter
     private String url;
 
-    @Value("appid")
+    @Setter
     private String appId;
 
-    @Value("secret")
+    @Setter
     private String secret;
 
-    private final String grantType = "authorization_code";
+    private final static String grantType = "authorization_code";
 
     @Autowired
     private RestTemplate restTemplate;
@@ -62,9 +63,9 @@ public class WechatAuthService {
                 return jsonNode.get("openid").asText();
             }
             if (jsonNode.has("errcode")) {
-                throw new CommonSysException(AidTrackerCommonErrorCode.INVALID_PARAM.getErrorCode(), "无效的微信 wechat code " + jsonNode.get("errmsg").asText());
+                throw new CommonSysException(AidTrackerCommonErrorCode.INVALID_PARAM.getErrorCode(), "无效的微信登录凭证code " + jsonNode.get("errmsg").asText());
             }
-            throw new CommonSysException(AidTrackerCommonErrorCode.INVALID_PARAM.getErrorCode(), "无效的微信接口信息" + jsonNode.asText());
+            throw new CommonSysException(AidTrackerCommonErrorCode.SYSTEM_ERROR.getErrorCode(), "无效的微信接口信息" + jsonNode.asText());
         } catch (JsonProcessingException e) {
             throw new CommonSysException(AidTrackerCommonErrorCode.SYSTEM_ERROR.getErrorCode(), e.getMessage(), e);
         }

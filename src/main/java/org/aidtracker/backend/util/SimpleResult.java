@@ -4,7 +4,7 @@ import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 /**
  * 通用的API包装
@@ -25,7 +25,7 @@ public class SimpleResult<T> implements Serializable {
 
     private Boolean success;
 
-    private Date time = new Date();
+    private ZonedDateTime time = ZonedDateTime.now();
 
     private T result;
 

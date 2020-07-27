@@ -3,12 +3,10 @@ package org.aidtracker.backend.domain;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.apache.commons.lang.StringUtils;
 
 import javax.persistence.Embeddable;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import java.util.Objects;
 
 /**
  * 抽象的联系方式 包含联系人等

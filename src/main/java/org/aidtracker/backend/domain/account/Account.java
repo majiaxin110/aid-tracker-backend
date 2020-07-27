@@ -35,13 +35,14 @@ public class Account {
     private String areaAdCode;
 
     @Enumerated(value = EnumType.STRING)
+    @Column(nullable = false)
     private AccountRoleEnum role;
 
     /**
      * 微信账号id
      * 注意目前业务较为简单，因此直接关联微信id
      */
-    @Column(name = "wechat_openid")
+    @Column(name = "wechat_openid", nullable = false)
     private String wechatOpenId;
 
     /**

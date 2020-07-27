@@ -1,6 +1,8 @@
 package org.aidtracker.backend.web.dto;
 
 import lombok.Data;
+import org.aidtracker.backend.domain.Contact;
+import org.aidtracker.backend.domain.account.AccountRoleEnum;
 
 /**
  * 新用户注册请求
@@ -22,15 +24,9 @@ public class AccountRegisterRequest {
      */
     private String areaAdCode;
 
-    /**
-     * 联系人姓名
-     */
-    private String contactName;
+    private AccountRoleEnum role;
 
-    private String type;
+    private Contact contact;
 
-    /**
-     * 具体的联系方式
-     */
-    private String contactInfo;
+    private String jsCode;
 }

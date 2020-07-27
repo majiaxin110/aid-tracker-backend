@@ -49,9 +49,9 @@ public class GlobalExceptionHandler {
         return simpleResult;
     }
 
-    @ExceptionHandler(InvalidParameterException.class)
+    @ExceptionHandler(IllegalArgumentException.class)
     @ResponseBody
-    public SimpleResult<?> handleInvalidParameterException(InvalidParameterException ex) throws UnknownHostException {
+    public SimpleResult<?> handleInvalidParameterException(IllegalArgumentException ex) throws UnknownHostException {
         Throwable rootCause = ExceptionUtils.getRootCause(ex);
         SimpleResult<Map<Object, Object>> simpleResult = SimpleResult.fail(AidTrackerCommonErrorCode.INVALID_PARAM.getErrorCode(),
                 MessageFormat.format("{0} rootCauseMsg: {1} Host: {2}",
