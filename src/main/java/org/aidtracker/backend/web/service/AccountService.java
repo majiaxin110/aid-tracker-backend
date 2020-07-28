@@ -7,7 +7,9 @@ import org.aidtracker.backend.domain.account.AccountRoleEnum;
 import org.aidtracker.backend.util.JwtTokenUtil;
 import org.aidtracker.backend.web.dto.AccountDTO;
 import org.aidtracker.backend.web.dto.AccountRegisterRequest;
+import org.aidtracker.backend.web.dto.AccountUpdateRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -76,6 +78,19 @@ public class AccountService {
         accountRepository.save(account);
 
         return AccountDTO.fromAccount(account, jwtTokenUtil.generateToken(account));
+    }
+
+    public AccountDTO update(AccountUpdateRequest request) {
+        Account account = (Account) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        account.setName(request.getName());
+        account.setContact(request.getContact());
+        account.setAreaAdCode(request.getAreaAdCode());
+        account.setQualification(request.getQualification());
+
+        accountRepository.save(account);
+
+        return AccountDTO.fromAccount(account);
     }
 
 }

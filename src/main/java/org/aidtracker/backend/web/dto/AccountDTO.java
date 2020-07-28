@@ -39,6 +39,12 @@ public class AccountDTO {
     private String loginToken;
 
     public static AccountDTO fromAccount(Account account, String token) {
+        AccountDTO accountDTO = fromAccount(account);
+        accountDTO.setLoginToken(token);
+        return accountDTO;
+    }
+
+    public static AccountDTO fromAccount(Account account) {
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setName(account.getName());
         accountDTO.setQualification(account.getQualification());
@@ -46,7 +52,6 @@ public class AccountDTO {
         accountDTO.setRole(account.getRole());
         accountDTO.setWechatOpenId(account.getWechatOpenId());
         accountDTO.setContact(account.getContact());
-        accountDTO.setLoginToken(token);
         return accountDTO;
     }
 }

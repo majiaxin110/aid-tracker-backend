@@ -5,13 +5,11 @@ import org.aidtracker.backend.domain.account.AccountRoleEnum;
 import org.aidtracker.backend.util.SimpleResult;
 import org.aidtracker.backend.web.dto.AccountDTO;
 import org.aidtracker.backend.web.dto.AccountRegisterRequest;
+import org.aidtracker.backend.web.dto.AccountUpdateRequest;
 import org.aidtracker.backend.web.service.AccountService;
 import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
 
@@ -47,6 +45,12 @@ public class AuthController {
     @ApiOperation(value = "注册")
     public SimpleResult<AccountDTO> tryRegister(@RequestBody AccountRegisterRequest request) {
         return SimpleResult.success(accountService.tryRegister(request));
+    }
+
+    @PutMapping("/account")
+    @ApiOperation(value = "用户信息更新")
+    public SimpleResult<AccountDTO> update(@RequestBody AccountUpdateRequest request) {
+        return SimpleResult.success(accountService.update(request));
     }
 
 }

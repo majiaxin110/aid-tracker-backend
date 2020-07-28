@@ -18,7 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * OncePerRequestFilter: Filter base class that aims to guarantee a single execution per request
@@ -35,18 +34,18 @@ public class JwtAuthTokenFilter extends OncePerRequestFilter {
     @Autowired
     private AccountRepository accountRepository;
 
-    private String tokenHeaderKey = "Authorization";
-    private String tokenHead = "Bearer ";
+    public static final String TOKEN_HEADER_KEY = "Authorization";
+    public static final String TOKEN_HEAD = "Bearer ";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         // 取得header
-        String authHeader = request.getHeader(this.tokenHeaderKey);
-        if (authHeader != null && authHeader.startsWith(tokenHead)) {
+        String authHeader = request.getHeader(TOKEN_HEADER_KEY);
+        if (authHeader != null && authHeader.startsWith(TOKEN_HEAD)) {
             // token 正式内容
-            final String authToken = authHeader.substring(tokenHead.length());
+            final String authToken = authHeader.substring(TOKEN_HEAD.length());
             String openId = jwtTokenUtil.getOpenIdFromToken(authToken);
             AccountRoleEnum roleEnum = jwtTokenUtil.getRoleFromToken(authToken);
 

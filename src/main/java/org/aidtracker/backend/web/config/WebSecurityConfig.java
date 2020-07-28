@@ -1,11 +1,8 @@
 package org.aidtracker.backend.web.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -25,7 +22,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     JwtAuthTokenFilter jwtAuthTokenFilter;
 
-    public static final String[] SWAGGER_RESOURCE={"/api/doc","/frame","/swagger-ui.html","/webjars/**","/swagger-resources/**","/v2/**"};
+    public static final String[] SWAGGER_RESOURCE = {"/api/doc", "/frame", "/swagger-ui.html", "/webjars/**", "/swagger-resources/**", "/v2/**"};
 
     @Override
     public void configure(WebSecurity web) {
@@ -43,7 +40,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/public/**").permitAll()
-                .antMatchers("/swagger-ui.html/**").permitAll()
                 .antMatchers("/auth/**").permitAll()
                 .anyRequest().authenticated()
         ;
