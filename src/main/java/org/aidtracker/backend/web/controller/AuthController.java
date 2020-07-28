@@ -1,6 +1,7 @@
 package org.aidtracker.backend.web.controller;
 
 import io.swagger.annotations.*;
+import org.aidtracker.backend.domain.account.AccountRoleEnum;
 import org.aidtracker.backend.util.SimpleResult;
 import org.aidtracker.backend.web.dto.AccountDTO;
 import org.aidtracker.backend.web.dto.AccountRegisterRequest;
@@ -33,8 +34,9 @@ public class AuthController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "新用户初次登录返回\"NEW_USER\"")
     })
-    public SimpleResult<?> tryLogin(@RequestParam @ApiParam("调用wx.login()产生的临时登录凭证Id") String jsCode) {
-        AccountDTO result = accountService.tryLogin(jsCode);
+    public SimpleResult<?> tryLogin(@RequestParam @ApiParam(value = "调用wx.login()产生的临时登录凭证Id", required = true) String jsCode,
+                                    @RequestParam(required = false) @ApiParam(value = "指定角色类型", required = false) AccountRoleEnum role) {
+        AccountDTO result = accountService.tryLogin(jsCode, role);
         if (Objects.isNull(result)) {
             return SimpleResult.success(NEW_USER);
         }

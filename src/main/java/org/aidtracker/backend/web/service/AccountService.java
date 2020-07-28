@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author mtage
@@ -38,10 +39,19 @@ public class AccountService {
      * @param jsCode
      * @return
      */
-    public AccountDTO tryLogin(String jsCode) {
-        List<Account> accountList = accountRepository.findAllByWechatOpenId(wechatAuthService.auth(jsCode));
-        if (accountList.size() > 0) {
-            return AccountDTO.fromAccount(accountList.get(0), jwtTokenUtil.generateToken(accountList.get(0)));
+    public AccountDTO tryLogin(String jsCode, AccountRoleEnum role) {
+        String openId = wechatAuthService.auth(jsCode);
+        // 允许不指定角色类型的登录
+        if (Objects.isNull(role)) {
+            List<Account> accountList = accountRepository.findAllByWechatOpenId(openId);
+            if (accountList.size() > 0) {
+                return AccountDTO.fromAccount(accountList.get(0), jwtTokenUtil.generateToken(accountList.get(0)));
+            }
+        } else {
+            Account account = accountRepository.findByWechatOpenIdAndRole(openId, role);
+            if (Objects.nonNull(account)) {
+                return AccountDTO.fromAccount(account, jwtTokenUtil.generateToken(account));
+            }
         }
         return null;
     }

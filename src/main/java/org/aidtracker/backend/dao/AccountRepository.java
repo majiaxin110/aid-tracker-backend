@@ -1,6 +1,7 @@
 package org.aidtracker.backend.dao;
 
 import org.aidtracker.backend.domain.account.Account;
+import org.aidtracker.backend.domain.account.AccountRoleEnum;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -11,4 +12,6 @@ import java.util.List;
  */
 public interface AccountRepository extends JpaRepository<Account, Long> {
     List<Account> findAllByWechatOpenId(String openId);
+
+    Account findByWechatOpenIdAndRole(String wechatOpenId, AccountRoleEnum role);
 }

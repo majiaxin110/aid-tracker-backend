@@ -4,6 +4,8 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.aidtracker.backend.domain.account.Account;
+import org.aidtracker.backend.domain.account.AccountRoleEnum;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +22,7 @@ public class JwtTokenUtil {
     private Long expiration = 3600000L;
 
     private final static String OPENID_KEY = "openid";
+    private final static String ROLE_KEY = "role";
     /**
      * 生成token令牌
      *
@@ -30,7 +33,7 @@ public class JwtTokenUtil {
         Map<String, Object> claims = new HashMap<>(2);
         // username in subject
         claims.put(OPENID_KEY, account.getWechatOpenId());
-        claims.put("created", new Date());
+        claims.put(ROLE_KEY, account.getRole().name());
         return Jwts.builder().setSubject(account.getName())
                 .addClaims(claims)
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
@@ -61,6 +64,17 @@ public class JwtTokenUtil {
     }
 
     /**
+     * 从令牌中获取用户名
+     *
+     * @param token 令牌
+     * @return 用户名
+     */
+    public AccountRoleEnum getRoleFromToken(String token) {
+        Claims claims = getClaimsFromToken(token);
+        return Optional.ofNullable(claims.get(ROLE_KEY)).map(Object::toString).map(AccountRoleEnum::valueOf).orElse(null);
+    }
+
+    /**
      * 验证令牌
      *
      * @param token       令牌
@@ -74,6 +88,20 @@ public class JwtTokenUtil {
 
         return (accountList.size() > 0) && !isTokenExpired(token) &&
                 accountOpenIdSet.size() == 1 && accountOpenIdSet.contains(openId);
+    }
+
+    /**
+     * 验证令牌
+     *
+     * @param token       令牌
+     * @return 是否有效
+     */
+    public boolean validateToken(String token, Account account) {
+        String openId = getOpenIdFromToken(token);
+        AccountRoleEnum roleEnum = getRoleFromToken(token);
+
+        return (StringUtils.equals(openId, account.getWechatOpenId())) && !isTokenExpired(token) &&
+                roleEnum == account.getRole();
     }
 
 

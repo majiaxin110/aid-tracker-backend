@@ -47,24 +47,22 @@ public class JwtAuthTokenFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith(tokenHead)) {
             // token 正式内容
             final String authToken = authHeader.substring(tokenHead.length());
-            String username = jwtTokenUtil.getUsernameFromToken(authToken);
+            String openId = jwtTokenUtil.getOpenIdFromToken(authToken);
+            AccountRoleEnum roleEnum = jwtTokenUtil.getRoleFromToken(authToken);
 
-            log.info("checking authentication " + username);
+            log.info("checking authentication {} role: {}", jwtTokenUtil.getUsernameFromToken(authToken), roleEnum);
 
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            if (openId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-                List<Account> accountList = accountRepository.findAllByWechatOpenId(username);
+                Account account = accountRepository.findByWechatOpenIdAndRole(openId, roleEnum);
 
-                if (jwtTokenUtil.validateToken(authToken, accountList)) {
+                if (jwtTokenUtil.validateToken(authToken, account)) {
                     // token 有效
-                    List<String> roleList = accountList.stream()
-                            .map(Account::getRole).map(AccountRoleEnum::name).collect(Collectors.toList());
-                    log.info("authenticated user:{} openid:{} roles:{}",
-                            username, jwtTokenUtil.getOpenIdFromToken(authToken), roleList);
-                    List<SimpleGrantedAuthority> authorities = roleList.stream().map(SimpleGrantedAuthority::new)
-                            .collect(Collectors.toList());
+                    log.info("authenticated user:{} openid:{} role:{}",
+                            openId, jwtTokenUtil.getOpenIdFromToken(authToken), roleEnum);
                     UsernamePasswordAuthenticationToken authentication =
-                            new UsernamePasswordAuthenticationToken(accountList, null, authorities);
+                            new UsernamePasswordAuthenticationToken(account, null,
+                                    List.of(new SimpleGrantedAuthority(roleEnum.name())));
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }
