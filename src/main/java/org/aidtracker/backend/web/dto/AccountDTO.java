@@ -1,5 +1,7 @@
 package org.aidtracker.backend.web.dto;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.aidtracker.backend.domain.Contact;
 import org.aidtracker.backend.domain.account.Account;
@@ -10,18 +12,14 @@ import org.aidtracker.backend.domain.account.AccountRoleEnum;
  * @since 2020/7/27 15:28
  */
 @Data
+@ApiModel(description = "账户信息")
 public class AccountDTO {
     private String name;
 
-    /**
-     * 资质
-     */
+    @ApiModelProperty("资质描述")
     private String qualification;
 
-    /**
-     * 地区代码
-     * @see <a href="https://lbs.qq.com/service/webService/webServiceGuide/webServiceDistrict">行政区划代码</href>
-     */
+    @ApiModelProperty("地区代码 <a href=\"https://lbs.qq.com/service/webService/webServiceGuiwebServiceDistrict\">行政区划代码</href>")
     private String areaAdCode;
 
     private AccountRoleEnum role;

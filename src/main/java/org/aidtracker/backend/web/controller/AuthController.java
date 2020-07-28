@@ -7,7 +7,6 @@ import org.aidtracker.backend.web.dto.AccountDTO;
 import org.aidtracker.backend.web.dto.AccountRegisterRequest;
 import org.aidtracker.backend.web.dto.AccountUpdateRequest;
 import org.aidtracker.backend.web.service.AccountService;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,13 +42,13 @@ public class AuthController {
 
     @PostMapping("/auth/register")
     @ApiOperation(value = "注册")
-    public SimpleResult<AccountDTO> tryRegister(@RequestBody AccountRegisterRequest request) {
+    public SimpleResult<AccountDTO> tryRegister(@RequestBody @ApiParam("AccountRegisterRequest") AccountRegisterRequest request) {
         return SimpleResult.success(accountService.tryRegister(request));
     }
 
     @PutMapping("/account")
     @ApiOperation(value = "用户信息更新")
-    public SimpleResult<AccountDTO> update(@RequestBody AccountUpdateRequest request) {
+    public SimpleResult<AccountDTO> update(@RequestBody @ApiParam("AccountUpdateRequest") AccountUpdateRequest request) {
         return SimpleResult.success(accountService.update(request));
     }
 

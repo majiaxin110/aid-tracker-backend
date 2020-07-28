@@ -36,6 +36,7 @@ public class JwtAuthTokenFilter extends OncePerRequestFilter {
 
     public static final String TOKEN_HEADER_KEY = "Authorization";
     public static final String TOKEN_HEAD = "Bearer ";
+    public static final String ROLE_PREFIX = "ROLE_";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,

@@ -1,9 +1,19 @@
 package org.aidtracker.backend.web.controller;
 
+import io.swagger.annotations.ApiParam;
 import org.aidtracker.backend.domain.demand.Demand;
+import org.aidtracker.backend.util.GlobalAuthUtil;
 import org.aidtracker.backend.util.SimpleResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.aidtracker.backend.web.dto.DemandCreateRequest;
+import org.aidtracker.backend.web.dto.DemandDTO;
+import org.aidtracker.backend.web.service.DemandService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -13,11 +23,22 @@ import java.util.List;
  */
 @RestController
 public class DemandController {
+    final DemandService demandService;
+
+    public DemandController(DemandService demandService) {
+        this.demandService = demandService;
+    }
 
     @GetMapping("/public/demand/list")
-    public SimpleResult<List<Demand>> getAllDemand() {
-        Demand demand = new Demand();
-        demand.setTopic("test");
-        return SimpleResult.success(List.of(demand));
+    public SimpleResult<Page<DemandDTO>> getAllDemand(@RequestParam(required = false, defaultValue = "0") int page,
+                                                      @RequestParam(required = false, defaultValue = "10") int size) {
+        return SimpleResult.success(demandService.allDemand(PageRequest.of(page, size)));
     }
+
+    @PostMapping("/demand")
+    @PreAuthorize("hasAnyAuthority('GRANTEE')")
+    public SimpleResult<DemandDTO> create(@RequestBody @ApiParam("DemandCreateRequest") DemandCreateRequest request) {
+        return SimpleResult.success(demandService.create(request, GlobalAuthUtil.authedAccount()));
+    }
+
 }

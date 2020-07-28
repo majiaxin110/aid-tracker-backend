@@ -1,7 +1,6 @@
 package org.aidtracker.backend.web.service;
 
 import org.aidtracker.backend.dao.AccountRepository;
-import org.aidtracker.backend.domain.Contact;
 import org.aidtracker.backend.domain.account.Account;
 import org.aidtracker.backend.domain.account.AccountRoleEnum;
 import org.aidtracker.backend.util.JwtTokenUtil;
@@ -11,9 +10,7 @@ import org.aidtracker.backend.web.dto.AccountUpdateRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
 import java.util.List;
 import java.util.Objects;
 

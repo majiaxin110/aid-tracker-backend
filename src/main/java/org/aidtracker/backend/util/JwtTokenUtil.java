@@ -1,14 +1,15 @@
 package org.aidtracker.backend.util;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.impl.DefaultClaims;
+import lombok.extern.slf4j.Slf4j;
 import org.aidtracker.backend.domain.account.Account;
 import org.aidtracker.backend.domain.account.AccountRoleEnum;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import javax.swing.text.html.Option;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
  * @since 2020/7/22 14:45
  */
 @Component
+@Slf4j
 public class JwtTokenUtil {
     private String secret = "jwt-aidtracker";
     private Long expiration = 3600000L;
@@ -119,18 +121,18 @@ public class JwtTokenUtil {
 
 
     /**
-     * 从令牌中获取数据声明
+     * 从令牌中获取数据声明 若解析令牌失败 返回空claim
      *
      * @param token 令牌
      * @return 数据声明
      */
     private Claims getClaimsFromToken(String token) {
-        Claims claims;
+        Claims claims = null;
         try {
             claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
-        } catch (Exception e) {
-            claims = null;
+        } catch (UnsupportedJwtException | MalformedJwtException | SignatureException | ExpiredJwtException | IllegalArgumentException exception) {
+            log.warn("parse token failed ", exception);
         }
-        return claims;
+        return Optional.ofNullable(claims).orElse(new DefaultClaims());
     }
 }
