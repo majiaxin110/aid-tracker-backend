@@ -20,6 +20,8 @@ public enum SupplyProjectStatusEnum {
 
     DONATE_CERT("捐赠证明"),
 
+    DONE("已完成"),
+
     FAILED("对接失败"),
 
     ;

@@ -1,21 +1,15 @@
 package org.aidtracker.backend.web.controller;
 
 import io.swagger.annotations.ApiParam;
-import org.aidtracker.backend.domain.demand.Demand;
 import org.aidtracker.backend.util.GlobalAuthUtil;
 import org.aidtracker.backend.util.SimpleResult;
 import org.aidtracker.backend.web.dto.DemandCreateRequest;
 import org.aidtracker.backend.web.dto.DemandDTO;
 import org.aidtracker.backend.web.service.DemandService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * @author mtage

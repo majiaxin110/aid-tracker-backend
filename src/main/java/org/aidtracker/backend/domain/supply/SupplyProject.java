@@ -1,7 +1,9 @@
 package org.aidtracker.backend.domain.supply;
 
 import lombok.Data;
+import org.aidtracker.backend.domain.Contact;
 import org.aidtracker.backend.domain.DeliverAddress;
+import org.aidtracker.backend.domain.Goods;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -34,6 +36,9 @@ public class SupplyProject {
     @Column(nullable = false)
     private long demandId;
 
+    @Embedded
+    private Goods goods;
+
     @Column(nullable = false, columnDefinition = "decimal(19, 2) default 0")
     private BigDecimal amount;
 
@@ -49,6 +54,12 @@ public class SupplyProject {
     private DeliverAddress address;
 
     private ZonedDateTime applyTime;
+
+    /**
+     * 联系方式
+     */
+    @Embedded
+    private Contact contact;
 
     @Column(columnDefinition = "TEXT")
     private String comment;

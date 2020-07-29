@@ -14,6 +14,8 @@ import org.aidtracker.backend.domain.account.AccountRoleEnum;
 @Data
 @ApiModel(description = "账户信息")
 public class AccountDTO {
+    private Long accountId;
+
     private String name;
 
     @ApiModelProperty("资质描述")
@@ -44,6 +46,7 @@ public class AccountDTO {
 
     public static AccountDTO fromAccount(Account account) {
         AccountDTO accountDTO = new AccountDTO();
+        accountDTO.setAccountId(account.getAccountId());
         accountDTO.setName(account.getName());
         accountDTO.setQualification(account.getQualification());
         accountDTO.setAreaAdCode(account.getAreaAdCode());

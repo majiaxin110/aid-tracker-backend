@@ -3,6 +3,7 @@ package org.aidtracker.backend.domain.demand;
 import lombok.Data;
 import org.aidtracker.backend.domain.Contact;
 import org.aidtracker.backend.domain.DeliverAddress;
+import org.aidtracker.backend.domain.Goods;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -35,6 +36,9 @@ public class Demand {
      * 受益方描述
      */
     private String audiences;
+
+    @Embedded
+    private Goods goods;
 
     /**
      * 需求数量

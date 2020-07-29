@@ -4,46 +4,29 @@ import lombok.Data;
 import org.aidtracker.backend.domain.Contact;
 import org.aidtracker.backend.domain.DeliverAddress;
 import org.aidtracker.backend.domain.Goods;
+import org.aidtracker.backend.domain.supply.SupplyDeliverMethodEnum;
 
 import java.math.BigDecimal;
 
 /**
  * @author mtage
- * @since 2020/7/28 13:43
+ * @since 2020/7/29 10:40
  */
 @Data
-public class DemandCreateRequest {
-    private String topic;
+public class SupplyProjectCreateRequest {
+    private AccountDTO account;
 
-    /**
-     * 受益方描述 援助受众
-     */
-    private String audiences;
+    private Long demandId;
 
     private Goods goods;
 
-    /**
-     * 需求数量
-     */
     private BigDecimal amount;
 
-    /**
-     * 寄送地址
-     */
+    private SupplyDeliverMethodEnum deliverMethod;
+
     private DeliverAddress address;
 
-    /**
-     * 自提范围信息
-     */
-    private String selfTakeInfo;
-
-    /**
-     * 联系方式
-     */
     private Contact contact;
 
-    /**
-     * 备注
-     */
     private String comment;
 }

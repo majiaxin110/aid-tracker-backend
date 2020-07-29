@@ -7,14 +7,11 @@ import org.aidtracker.backend.web.dto.DemandCreateRequest;
 import org.aidtracker.backend.web.dto.DemandDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author mtage

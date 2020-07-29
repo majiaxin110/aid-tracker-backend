@@ -17,10 +17,10 @@ import java.time.ZonedDateTime;
 @Data
 @ApiModel("单个需求信息")
 public class DemandDTO {
-    private long demandId;
+    private Long demandId;
 
     @ApiModelProperty("发布者id")
-    private long accountId;
+    private Long accountId;
 
     private String topic;
 
