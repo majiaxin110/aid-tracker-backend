@@ -32,5 +32,23 @@ public class SupplyProjectLog {
     private String info;
 
     @Convert(converter = SimpleStringListConverter.class)
-    private List<String> fileIds;
+    private List<Long> fileIds;
+
+    public static SupplyProjectLog of() {
+        SupplyProjectLog projectLog = new SupplyProjectLog();
+        projectLog.setTime(ZonedDateTime.now());
+        return projectLog;
+    }
+
+    public static SupplyProjectLog of(SupplyProjectLogTypeEnum logType) {
+        SupplyProjectLog projectLog = of();
+        projectLog.setLogType(logType);
+        return projectLog;
+    }
+
+    public static SupplyProjectLog of(SupplyProjectLogTypeEnum logType, List<Long> fileIds) {
+        SupplyProjectLog projectLog = of(logType);
+        projectLog.setFileIds(fileIds);
+        return projectLog;
+    }
 }

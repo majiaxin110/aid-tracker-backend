@@ -1,5 +1,6 @@
 package org.aidtracker.backend.web.controller;
 
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.aidtracker.backend.util.GlobalAuthUtil;
 import org.aidtracker.backend.util.SimpleResult;
@@ -24,18 +25,21 @@ public class DemandController {
         this.demandService = demandService;
     }
 
+    @ApiOperation("开放接口 全部需求列表")
     @GetMapping("/public/demand/list")
     public SimpleResult<Page<DemandDTO>> getAllDemand(@RequestParam(required = false, defaultValue = "0") int page,
                                                       @RequestParam(required = false, defaultValue = "10") int size) {
         return SimpleResult.success(demandService.allDemand(PageRequest.of(page, size)));
     }
 
+    @ApiOperation("新建需求")
     @PostMapping("/demand")
     @PreAuthorize("hasAnyAuthority('GRANTEE')")
     public SimpleResult<DemandDTO> create(@RequestBody @ApiParam("DemandCreateRequest") DemandCreateRequest request) {
         return SimpleResult.success(demandService.create(request, GlobalAuthUtil.authedAccount()));
     }
 
+    @ApiOperation("更新需求")
     @PutMapping("/demand")
     @PreAuthorize("hasAnyAuthority('GRANTEE')")
     public SimpleResult<DemandDTO> update(@RequestBody @ApiParam("DemandUpdateRequest") DemandUpdateRequest request) {

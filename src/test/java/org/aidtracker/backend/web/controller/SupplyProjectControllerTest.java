@@ -37,7 +37,6 @@ class SupplyProjectControllerTest extends AccountEnvBaseTest {
     void create() throws JsonProcessingException {
         Goods goods = new Goods("手办", "精品233", "万代", "个");
         SupplyProjectCreateRequest request = new SupplyProjectCreateRequest();
-        request.setAccount(AccountDTO.fromAccount(testAccount));
         request.setGoods(goods);
         request.setAddress(new DeliverAddress("200000", "上海黄浦江"));
         request.setDemandId(1L);

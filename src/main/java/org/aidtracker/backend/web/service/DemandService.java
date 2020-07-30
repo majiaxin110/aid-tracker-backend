@@ -3,6 +3,7 @@ package org.aidtracker.backend.web.service;
 import org.aidtracker.backend.dao.DemandRepository;
 import org.aidtracker.backend.domain.account.Account;
 import org.aidtracker.backend.domain.demand.Demand;
+import org.aidtracker.backend.domain.demand.DemandStatusEnum;
 import org.aidtracker.backend.util.AidTrackerCommonErrorCode;
 import org.aidtracker.backend.util.CommonSysException;
 import org.aidtracker.backend.web.dto.DemandCreateRequest;
@@ -41,6 +42,7 @@ public class DemandService {
         demand.setAccountId(account.getAccountId());
         demand.setTopic(request.getTopic());
         demand.setAudiences(request.getAudiences());
+        demand.setStatus(DemandStatusEnum.DEMAND_SUBMIT);
         demand.setAmount(request.getAmount());
         demand.setMetAmount(BigDecimal.ZERO);
         demand.setAddress(request.getAddress());

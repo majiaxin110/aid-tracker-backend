@@ -1,6 +1,12 @@
 package org.aidtracker.backend.domain.supply;
 
 import lombok.Getter;
+import org.aidtracker.backend.util.AidTrackerCommonErrorCode;
+import org.aidtracker.backend.util.CommonSysException;
+
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author mtage
@@ -13,8 +19,6 @@ public enum SupplyProjectStatusEnum {
     DONATE_SUBMIT("捐赠申请"),
 
     GRANTEE_REPLY("受捐方回复"),
-
-    DISPATCH("填写物流"),
 
     LOGISTICS_TRACKING("运输追踪"),
 
@@ -31,5 +35,21 @@ public enum SupplyProjectStatusEnum {
 
     SupplyProjectStatusEnum(String desc) {
         this.desc = desc;
+    }
+
+    /**
+     * 验证转换状态目标是否合法
+     * @param goalStatus
+     */
+    public static void verifyStatus(SupplyProjectStatusEnum currentStatus, SupplyProjectStatusEnum goalStatus) {
+        List<SupplyProjectStatusEnum> allStatus = Arrays.asList(SupplyProjectStatusEnum.values());
+        for (int i = 0; i < allStatus.size(); i++) {
+            if (allStatus.get(i) == goalStatus) {
+                if (i <= 0 || allStatus.get(i - 1) != currentStatus) {
+                    throw new CommonSysException(AidTrackerCommonErrorCode.INVALID_PARAM.getErrorCode(),
+                            allStatus.get(i - 1).desc + " 才能进行 " + goalStatus.desc);
+                }
+            }
+        }
     }
 }

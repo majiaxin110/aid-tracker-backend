@@ -127,12 +127,11 @@ public class JwtTokenUtil {
      * @return 数据声明
      */
     private Claims getClaimsFromToken(String token) {
-        Claims claims = null;
         try {
-            claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+            return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
         } catch (UnsupportedJwtException | MalformedJwtException | SignatureException | ExpiredJwtException | IllegalArgumentException exception) {
             log.warn("parse token failed ", exception);
         }
-        return Optional.ofNullable(claims).orElse(new DefaultClaims());
+        return new DefaultClaims();
     }
 }
