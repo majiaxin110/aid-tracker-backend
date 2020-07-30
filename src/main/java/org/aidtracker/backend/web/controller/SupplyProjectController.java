@@ -5,10 +5,12 @@ import org.aidtracker.backend.util.GlobalAuthUtil;
 import org.aidtracker.backend.util.SimpleResult;
 import org.aidtracker.backend.web.dto.SupplyProjectCreateRequest;
 import org.aidtracker.backend.web.dto.SupplyProjectDTO;
+import org.aidtracker.backend.web.dto.SupplyProjectUpdateRequest;
 import org.aidtracker.backend.web.service.SupplyProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,5 +31,11 @@ public class SupplyProjectController {
     @PreAuthorize("hasAnyAuthority('DONATOR')")
     public SimpleResult<SupplyProjectDTO> create(@RequestBody @ApiParam("SupplyProjectCreateRequest") SupplyProjectCreateRequest request) {
         return SimpleResult.success(supplyProjectService.create(request, GlobalAuthUtil.authedAccount()));
+    }
+
+    @PutMapping("/supply-project")
+    @PreAuthorize("hasAnyAuthority('DONATOR')")
+    public SimpleResult<SupplyProjectDTO> update(@RequestBody @ApiParam("SupplyProjectUpdateRequest") SupplyProjectUpdateRequest request) {
+        return SimpleResult.success(supplyProjectService.update(request, GlobalAuthUtil.authedAccount()));
     }
 }

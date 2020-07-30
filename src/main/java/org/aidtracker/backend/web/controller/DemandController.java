@@ -5,6 +5,7 @@ import org.aidtracker.backend.util.GlobalAuthUtil;
 import org.aidtracker.backend.util.SimpleResult;
 import org.aidtracker.backend.web.dto.DemandCreateRequest;
 import org.aidtracker.backend.web.dto.DemandDTO;
+import org.aidtracker.backend.web.dto.DemandUpdateRequest;
 import org.aidtracker.backend.web.service.DemandService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,6 +34,12 @@ public class DemandController {
     @PreAuthorize("hasAnyAuthority('GRANTEE')")
     public SimpleResult<DemandDTO> create(@RequestBody @ApiParam("DemandCreateRequest") DemandCreateRequest request) {
         return SimpleResult.success(demandService.create(request, GlobalAuthUtil.authedAccount()));
+    }
+
+    @PutMapping("/demand")
+    @PreAuthorize("hasAnyAuthority('GRANTEE')")
+    public SimpleResult<DemandDTO> update(@RequestBody @ApiParam("DemandUpdateRequest") DemandUpdateRequest request) {
+        return SimpleResult.success(demandService.update(request, GlobalAuthUtil.authedAccount()));
     }
 
 }

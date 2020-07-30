@@ -5,13 +5,17 @@ import org.aidtracker.backend.dao.SupplyProjectRepository;
 import org.aidtracker.backend.domain.account.Account;
 import org.aidtracker.backend.domain.supply.SupplyProject;
 import org.aidtracker.backend.domain.supply.SupplyProjectStatusEnum;
+import org.aidtracker.backend.util.AidTrackerCommonErrorCode;
+import org.aidtracker.backend.util.CommonSysException;
 import org.aidtracker.backend.web.dto.SupplyProjectCreateRequest;
 import org.aidtracker.backend.web.dto.SupplyProjectDTO;
+import org.aidtracker.backend.web.dto.SupplyProjectUpdateRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 捐赠项目相关
@@ -37,6 +41,22 @@ public class SupplyProjectService {
         supplyProject.setDeliverMethod(request.getDeliverMethod());
         supplyProject.setAddress(request.getAddress());
         supplyProject.setApplyTime(ZonedDateTime.now());
+        supplyProject.setContact(request.getContact());
+        supplyProject.setComment(request.getComment());
+
+        supplyProject = supplyProjectRepository.save(supplyProject);
+
+        return SupplyProjectDTO.fromSupplyProject(supplyProject, account);
+    }
+
+    public SupplyProjectDTO update(SupplyProjectUpdateRequest request, Account account) {
+        SupplyProject supplyProject = supplyProjectRepository.findBySupplyProjectIdAndAccountId(request.getSupplyProjectId(),
+                account.getAccountId());
+        if (Objects.isNull(supplyProject)) {
+            throw new CommonSysException(AidTrackerCommonErrorCode.INVALID_PARAM.getErrorCode(), "不存在的捐赠项目id");
+        }
+        supplyProject.setDeliverMethod(request.getDeliverMethod());
+        supplyProject.setAddress(request.getAddress());
         supplyProject.setContact(request.getContact());
         supplyProject.setComment(request.getComment());
 

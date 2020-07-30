@@ -13,4 +13,6 @@ public interface SupplyProjectRepository extends JpaRepository<SupplyProject, Lo
     List<SupplyProject> getAllByDemandId(long demandId);
 
     List<SupplyProject> getAllByAccountId(long accountId);
+
+    SupplyProject findBySupplyProjectIdAndAccountId(long supplyProjectId, long accountId);
 }

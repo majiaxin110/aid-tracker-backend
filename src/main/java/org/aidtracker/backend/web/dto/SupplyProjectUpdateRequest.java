@@ -13,12 +13,8 @@ import java.math.BigDecimal;
  * @since 2020/7/29 10:40
  */
 @Data
-public class SupplyProjectCreateRequest {
-    private Long demandId;
-
-    private Goods goods;
-
-    private BigDecimal amount;
+public class SupplyProjectUpdateRequest {
+    private Long supplyProjectId;
 
     private SupplyDeliverMethodEnum deliverMethod;
 
