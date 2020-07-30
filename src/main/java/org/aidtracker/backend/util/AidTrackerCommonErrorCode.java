@@ -23,6 +23,11 @@ public enum AidTrackerCommonErrorCode {
     SYSTEM_ERROR("SYSTEM_ERROR"),
 
     /**
+     * 对象存储连接异常
+     */
+    CORS_ERROR("SYSTEM_ERROR"),
+
+    /**
      * 配置错误
      */
     CONFIG_ERROR("CONFIG_ERROR")
