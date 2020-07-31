@@ -1,5 +1,6 @@
 package org.aidtracker.backend.web.controller;
 
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.aidtracker.backend.util.GlobalAuthUtil;
 import org.aidtracker.backend.util.SimpleResult;
@@ -27,12 +28,14 @@ public class SupplyProjectController {
         this.supplyProjectService = supplyProjectService;
     }
 
+    @ApiOperation("新建 捐赠项目")
     @PostMapping("/supply-project")
     @PreAuthorize("hasAnyAuthority('DONATOR')")
     public SimpleResult<SupplyProjectDTO> create(@RequestBody @ApiParam("SupplyProjectCreateRequest") SupplyProjectCreateRequest request) {
         return SimpleResult.success(supplyProjectService.create(request, GlobalAuthUtil.authedAccount()));
     }
 
+    @ApiOperation("更新 捐赠项目")
     @PutMapping("/supply-project")
     @PreAuthorize("hasAnyAuthority('DONATOR')")
     public SimpleResult<SupplyProjectDTO> update(@RequestBody @ApiParam("SupplyProjectUpdateRequest") SupplyProjectUpdateRequest request) {

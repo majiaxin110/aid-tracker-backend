@@ -11,7 +11,7 @@ import java.util.List;
  * @since 2020/7/25 12:48
  */
 public interface AccountRepository extends JpaRepository<Account, Long> {
-    List<Account> getAllByWechatOpenId(String openId);
+    List<Account> findAllByWechatOpenId(String openId);
 
-    Account getByWechatOpenIdAndRole(String wechatOpenId, AccountRoleEnum role);
+    Account findByWechatOpenIdAndRole(String wechatOpenId, AccountRoleEnum role);
 }

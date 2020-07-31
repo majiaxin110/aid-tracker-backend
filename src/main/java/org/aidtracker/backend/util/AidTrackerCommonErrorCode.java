@@ -12,6 +12,8 @@ public enum AidTrackerCommonErrorCode {
      */
     NOT_FOUND("NOT_FOUND"),
 
+    FORBIDDEN("FORBIDDEN"),
+
     /**
      * 参数错误
      */

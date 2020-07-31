@@ -14,6 +14,8 @@ public enum DemandStatusEnum {
 
     DONE("需求完成"),
 
+    PAUSE("暂停中"),
+
     CLOSED("需求关闭")
     ;
 

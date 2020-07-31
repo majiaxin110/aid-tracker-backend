@@ -42,12 +42,12 @@ public class AccountService {
         String openId = wechatAuthService.auth(jsCode);
         // 允许不指定角色类型的登录
         if (Objects.isNull(role)) {
-            List<Account> accountList = accountRepository.getAllByWechatOpenId(openId);
+            List<Account> accountList = accountRepository.findAllByWechatOpenId(openId);
             if (accountList.size() > 0) {
                 return AccountDTO.fromAccount(accountList.get(0), jwtTokenUtil.generateToken(accountList.get(0)));
             }
         } else {
-            Account account = accountRepository.getByWechatOpenIdAndRole(openId, role);
+            Account account = accountRepository.findByWechatOpenIdAndRole(openId, role);
             if (Objects.nonNull(account)) {
                 return AccountDTO.fromAccount(account, jwtTokenUtil.generateToken(account));
             }

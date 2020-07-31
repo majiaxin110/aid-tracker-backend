@@ -54,7 +54,7 @@ public class JwtAuthTokenFilter extends OncePerRequestFilter {
 
             if (openId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-                Account account = accountRepository.getByWechatOpenIdAndRole(openId, roleEnum);
+                Account account = accountRepository.findByWechatOpenIdAndRole(openId, roleEnum);
 
                 if (jwtTokenUtil.validateToken(authToken, account)) {
                     // token 有效

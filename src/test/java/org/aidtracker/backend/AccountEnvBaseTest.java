@@ -7,7 +7,6 @@ import org.aidtracker.backend.dao.AccountRepository;
 import org.aidtracker.backend.domain.account.Account;
 import org.aidtracker.backend.domain.account.AccountRoleEnum;
 import org.aidtracker.backend.web.service.WechatAuthService;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -53,7 +52,7 @@ public class AccountEnvBaseTest extends BaseTest {
 
     @BeforeEach
     public void setUpTestAccount() {
-        Account existAccount = accountRepository.getByWechatOpenIdAndRole(testOpenId, testRole);
+        Account existAccount = accountRepository.findByWechatOpenIdAndRole(testOpenId, testRole);
         if (Objects.isNull(existAccount)) {
             testAccount = accountRepository.save(testAccount);
         }

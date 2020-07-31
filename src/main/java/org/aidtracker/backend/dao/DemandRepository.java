@@ -1,7 +1,10 @@
 package org.aidtracker.backend.dao;
 
 import org.aidtracker.backend.domain.demand.Demand;
+import org.aidtracker.backend.domain.demand.DemandStatusEnum;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
 
 /**
  * @author mtage
@@ -9,4 +12,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface DemandRepository extends JpaRepository<Demand, Long> {
     Demand findByDemandIdAndAccountId(long demandId, long accountId);
+
+    List<Demand> findAllByStatus(List<DemandStatusEnum> statusEnumList);
+
+    List<Demand> findAllByAccountId(long accountId);
 }

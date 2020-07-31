@@ -2,16 +2,21 @@ package org.aidtracker.backend.web.controller;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.aidtracker.backend.domain.demand.DemandStatusEnum;
 import org.aidtracker.backend.util.GlobalAuthUtil;
 import org.aidtracker.backend.util.SimpleResult;
 import org.aidtracker.backend.web.dto.DemandCreateRequest;
 import org.aidtracker.backend.web.dto.DemandDTO;
 import org.aidtracker.backend.web.dto.DemandUpdateRequest;
+import org.aidtracker.backend.web.dto.DemandWithSupplyDTO;
 import org.aidtracker.backend.web.service.DemandService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author mtage
@@ -31,6 +36,14 @@ public class DemandController {
                                                       @RequestParam(required = false, defaultValue = "10") int size) {
         return SimpleResult.success(demandService.allDemand(PageRequest.of(page, size)));
     }
+
+    @ApiOperation("用户全部需求列表")
+    @GetMapping("/demand/list/self")
+    @PreAuthorize("hasAnyAuthority('GRANTEE')")
+    public SimpleResult<Map<DemandStatusEnum, List<DemandWithSupplyDTO>>> getAllDemandByAccount() {
+        return SimpleResult.success(demandService.allDemandByAccount(GlobalAuthUtil.authedAccount()));
+    }
+
 
     @ApiOperation("新建需求")
     @PostMapping("/demand")

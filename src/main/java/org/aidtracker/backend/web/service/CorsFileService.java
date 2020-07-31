@@ -58,7 +58,7 @@ public class CorsFileService {
             file.transferTo(tempFile);
             String key = corsUtil.uploadFile(tempFile);
             CorsFile corsFile = new CorsFile();
-            corsFile.setName(file.getName());
+            corsFile.setName(key);
             corsFile.setAccountId(account.getAccountId());
             corsFile.setUrl(qcloudUrlPrefix + key);
             corsFile.setComment(comment);

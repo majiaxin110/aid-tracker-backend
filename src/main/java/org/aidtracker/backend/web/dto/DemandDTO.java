@@ -6,6 +6,7 @@ import lombok.Data;
 import org.aidtracker.backend.domain.Contact;
 import org.aidtracker.backend.domain.DeliverAddress;
 import org.aidtracker.backend.domain.demand.Demand;
+import org.aidtracker.backend.domain.demand.DemandStatusEnum;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -26,6 +27,9 @@ public class DemandDTO {
 
     @ApiModelProperty("受益方描述")
     private String audiences;
+
+    @ApiModelProperty("状态")
+    private DemandStatusEnum status;
 
     @ApiModelProperty("需求数量")
     private BigDecimal amount;
@@ -52,6 +56,7 @@ public class DemandDTO {
         demandDTO.setAccountId(demand.getAccountId());
         demandDTO.setTopic(demand.getTopic());
         demandDTO.setAudiences(demand.getAudiences());
+        demandDTO.setStatus(demand.getStatus());
         demandDTO.setAmount(demand.getAmount());
         demandDTO.setMetAmount(demand.getMetAmount());
         demandDTO.setAddress(demand.getAddress());

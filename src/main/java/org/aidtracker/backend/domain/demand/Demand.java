@@ -103,6 +103,10 @@ public class Demand {
             throw new CommonSysException(AidTrackerCommonErrorCode.INVALID_PARAM.getErrorCode(),
                     "捐赠项目未处于受捐方同意状态");
         }
+        if (this.status != DemandStatusEnum.DEMAND_SUBMIT) {
+            throw new CommonSysException(AidTrackerCommonErrorCode.INVALID_PARAM.getErrorCode(),
+                    "捐赠需求状态非法 " + this.status.name());
+        }
         this.metAmount = this.metAmount.add(supplyProject.getAmount());
         if (this.amount.compareTo(this.metAmount) == 0) {
             this.setStatus(DemandStatusEnum.DONE);

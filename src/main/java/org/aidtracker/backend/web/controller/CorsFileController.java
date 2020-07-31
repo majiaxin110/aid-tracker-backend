@@ -22,7 +22,7 @@ public class CorsFileController {
     CorsFileService corsFileService;
 
     @PostMapping("/cors-file")
-    public SimpleResult<CorsFile> upload(MultipartFile file, @RequestParam String comment) {
+    public SimpleResult<CorsFile> upload(MultipartFile file, @RequestParam(required = false) String comment) {
         return SimpleResult.success(corsFileService.uploadToQcloud(file, comment, GlobalAuthUtil.authedAccount()));
     }
 }
