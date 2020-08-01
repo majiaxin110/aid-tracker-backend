@@ -12,9 +12,7 @@ import org.aidtracker.backend.domain.DeliverAddress;
 import org.aidtracker.backend.domain.Goods;
 import org.aidtracker.backend.domain.supply.*;
 import org.aidtracker.backend.util.SimpleResult;
-import org.aidtracker.backend.web.dto.DispatchRequest;
-import org.aidtracker.backend.web.dto.SupplyProjectCreateRequest;
-import org.aidtracker.backend.web.dto.SupplyProjectDTO;
+import org.aidtracker.backend.web.dto.*;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,5 +127,51 @@ class SupplyProjectControllerTest extends AccountEnvBaseTest {
 
         List<DeliverPeriod> deliverPeriodList = deliverPeriodRepository.findAllBySupplyProjectId(supplyProjectId);
         assertEquals(2, deliverPeriodList.size());
+    }
+
+    @Test
+    void granteeSubmitCert() throws JsonProcessingException, InterruptedException {
+        Goods goods = new Goods("蓝光盘", "BD", "Kyoto Animation", "套");
+        SupplyProjectCreateRequest projectCreateRequest = new SupplyProjectCreateRequest();
+        projectCreateRequest.setGoods(goods);
+        projectCreateRequest.setAddress(new DeliverAddress("200000", "上海黄浦江"));
+        projectCreateRequest.setDemandId(2L);
+        projectCreateRequest.setDeliverMethod(SupplyDeliverMethodEnum.DONATOR);
+        projectCreateRequest.setAmount(BigDecimal.TEN);
+        SimpleResult<SupplyProjectDTO> createResult = supplyProjectController.create(projectCreateRequest);
+        Long supplyProjectId = createResult.getResult().getSupplyProjectId();
+
+        setUpGranteeEnv();
+
+        SimpleResult<String> agreeResult = supplyProjectController.granteeAgree(supplyProjectId);
+        checkAndPrint(agreeResult);
+
+        setUpDonatorEnv();
+
+        DispatchRequest dispatchRequest = new DispatchRequest();
+        dispatchRequest.setSupplyProjectId(supplyProjectId);
+        DispatchRequest.DeliverPeriodInfo deliverPeriodInfoA = DispatchRequest.DeliverPeriodInfo.builder()
+                .periodType(DeliverPeriodTypeEnum.EXPRESS)
+                .trackingNum(RandomStringUtils.random(20))
+                .build();
+        dispatchRequest.setDeliverPeriodList(Lists.newArrayList(deliverPeriodInfoA));
+
+        SimpleResult<String> dispatchResult = supplyProjectController.donatorDispatch(dispatchRequest);
+        checkAndPrint(dispatchResult);
+
+        Thread.sleep(1000);
+        setUpGranteeEnv();
+
+        GranteeReceivedRequest receivedRequest = new GranteeReceivedRequest();
+        receivedRequest.setSupplyProjectId(supplyProjectId);
+        receivedRequest.setFileIds(Lists.newArrayList(1L));
+        SimpleResult<String> receivedResult = supplyProjectController.granteeReceived(receivedRequest);
+        checkAndPrint(receivedResult);
+
+        DonateCertRequest donateCertRequest = new DonateCertRequest();
+        donateCertRequest.setSupplyProjectId(supplyProjectId);
+        donateCertRequest.setFileIds(Lists.newArrayList(2L, 5L));
+        SimpleResult<String> certResult = supplyProjectController.granteeSubmitCert(donateCertRequest);
+        checkAndPrint(certResult);
     }
 }

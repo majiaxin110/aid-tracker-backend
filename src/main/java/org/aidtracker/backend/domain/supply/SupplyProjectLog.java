@@ -44,6 +44,7 @@ public class SupplyProjectLog {
     public static SupplyProjectLog of(SupplyProject supplyProject, SupplyProjectLogTypeEnum logType) {
         SupplyProjectLog projectLog = of(supplyProject.getSupplyProjectId());
         projectLog.setLogType(logType);
+        projectLog.setInfo(logType.getDesc());
         return projectLog;
     }
 

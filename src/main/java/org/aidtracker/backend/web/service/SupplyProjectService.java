@@ -13,10 +13,7 @@ import org.aidtracker.backend.domain.supply.SupplyProjectLog;
 import org.aidtracker.backend.domain.supply.SupplyProjectStatusEnum;
 import org.aidtracker.backend.util.AidTrackerCommonErrorCode;
 import org.aidtracker.backend.util.CommonSysException;
-import org.aidtracker.backend.web.dto.DispatchRequest;
-import org.aidtracker.backend.web.dto.SupplyProjectCreateRequest;
-import org.aidtracker.backend.web.dto.SupplyProjectDTO;
-import org.aidtracker.backend.web.dto.SupplyProjectUpdateRequest;
+import org.aidtracker.backend.web.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -81,16 +78,14 @@ public class SupplyProjectService {
 
     @Transactional(rollbackFor = Exception.class)
     public void granteeAgree(long supplyProjectId, Account granteeAccount) {
-        SupplyProject supplyProject = supplyProjectRepository.findById(supplyProjectId).orElseThrow(() ->
-                new CommonSysException(AidTrackerCommonErrorCode.NOT_FOUND.getErrorCode(), "未找到对应捐赠项目"));
-        Demand demand = demandRepository.findById(supplyProject.getDemandId()).orElseThrow(() ->
-                new CommonSysException(AidTrackerCommonErrorCode.SYSTEM_ERROR.getErrorCode(), "捐赠项目无正确关联的需求 " + supplyProjectId));
+        SupplyProject supplyProject = findById(supplyProjectId);
+        Demand demand = findGranteeDemand(supplyProject, granteeAccount);
         if (demand.getAccountId() != granteeAccount.getAccountId()) {
             throw new CommonSysException(AidTrackerCommonErrorCode.FORBIDDEN.getErrorCode(), "无该项目权限");
         }
 
         SupplyProjectLog projectLog = supplyProject.granteeAgreed(granteeAccount);
-        demand.confirm(supplyProject);
+        demand.agree(supplyProject);
 
         supplyProjectRepository.save(supplyProject);
         supplyProjectLogRepository.save(projectLog);
@@ -113,6 +108,48 @@ public class SupplyProjectService {
 
         supplyProjectRepository.save(supplyProject);
         supplyProjectLogRepository.save(projectLog);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void granteeReceived(GranteeReceivedRequest request, Account granteeAccount) {
+        SupplyProject supplyProject = findById(request.getSupplyProjectId());
+        Demand demand = findGranteeDemand(supplyProject, granteeAccount);
+
+        SupplyProjectLog projectLog = supplyProject.granteeReceived(request.getFileIds());
+        supplyProjectRepository.save(supplyProject);
+        supplyProjectLogRepository.save(projectLog);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void granteeSubmitCert(DonateCertRequest request, Account granteeAccount) {
+        SupplyProject supplyProject = findById(request.getSupplyProjectId());
+        Demand demand = findGranteeDemand(supplyProject, granteeAccount);
+
+        SupplyProjectLog projectLog = supplyProject.donateCert(request.getFileIds());
+        supplyProjectRepository.save(supplyProject);
+        supplyProjectLogRepository.save(projectLog);
+    }
+
+
+    public SupplyProject findById(long supplyProjectId) {
+        return supplyProjectRepository.findById(supplyProjectId).orElseThrow(() ->
+                new CommonSysException(AidTrackerCommonErrorCode.NOT_FOUND.getErrorCode(), "未找到对应捐赠项目"));
+    }
+
+    /**
+     * 找到某个捐赠项目所关联的需求
+     * @param supplyProject
+     * @param granteeAccount
+     * @throws CommonSysException (FORBIDDEN) 校验granteeAccount管理该需求权限失败
+     * @return
+     */
+    private Demand findGranteeDemand(SupplyProject supplyProject, Account granteeAccount) {
+        Demand demand = demandRepository.findById(supplyProject.getDemandId()).orElseThrow(() ->
+                new CommonSysException(AidTrackerCommonErrorCode.SYSTEM_ERROR.getErrorCode(), "捐赠项目无正确关联的需求 " + supplyProject.getSupplyProjectId()));
+        if (demand.getAccountId() != granteeAccount.getAccountId()) {
+            throw new CommonSysException(AidTrackerCommonErrorCode.FORBIDDEN.getErrorCode(), "无该项目权限");
+        }
+        return demand;
     }
 
     private SupplyProject findProjectByIdAccount(long supplyProjectId, Account donatorAccount) {

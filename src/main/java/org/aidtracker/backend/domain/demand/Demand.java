@@ -94,7 +94,7 @@ public class Demand {
      * 若减去该项目后需求完全满足，本需求状态将被设置为已完成
      * @param supplyProject
      */
-    public void confirm(SupplyProject supplyProject) {
+    public void agree(SupplyProject supplyProject) {
         if (Objects.isNull(supplyProject) || supplyProject.getDemandId() != this.demandId) {
             throw new CommonSysException(AidTrackerCommonErrorCode.INVALID_PARAM.getErrorCode(),
                     "捐赠项目无效，不是该需求对应的捐赠项目");

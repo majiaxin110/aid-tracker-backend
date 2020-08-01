@@ -19,7 +19,7 @@ public enum SupplyProjectLogTypeEnum {
 
     LOGISTICS_TRACKING("运输追踪"),
 
-    GRANTEE_CONFIRM("受捐方确认收货"),
+    GRANTEE_RECEIVED("受捐方确认收货"),
 
     DONATE_CERT("受捐方开具捐献证明"),
 

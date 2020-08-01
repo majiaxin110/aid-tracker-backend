@@ -4,20 +4,22 @@ import com.google.common.collect.Lists;
 
 import javax.persistence.AttributeConverter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author mtage
  * @since 2020/7/25 13:24
  */
-public class SimpleStringListConverter implements AttributeConverter<List<String>, String> {
+public class SimpleStringListConverter implements AttributeConverter<List<Long>, String> {
 
     @Override
-    public String convertToDatabaseColumn(List<String> attribute) {
-        return attribute == null ? null : String.join(",", attribute);
+    public String convertToDatabaseColumn(List<Long> attribute) {
+        return attribute == null ? null : attribute.stream().map(Object::toString).collect(Collectors.joining(","));
     }
 
     @Override
-    public List<String> convertToEntityAttribute(String dbData) {
-        return dbData == null ? null : Lists.newArrayList(dbData.split(","));
+    public List<Long> convertToEntityAttribute(String dbData) {
+        return dbData == null ? null : Lists.newArrayList(dbData.split(",")).stream().map(Long::parseLong)
+                .collect(Collectors.toList());
     }
 }

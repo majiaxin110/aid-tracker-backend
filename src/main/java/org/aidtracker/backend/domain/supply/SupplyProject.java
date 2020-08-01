@@ -102,17 +102,19 @@ public class SupplyProject {
     /**
      * 受捐方确认了收货
      * 状态转变为 DONATE_CERT 等待受捐方开具证明
+     * @param fileIds 收货证明
      * @return
      */
-    public SupplyProjectLog granteeConfirm() {
+    public SupplyProjectLog granteeReceived(List<Long> fileIds) {
         verifyStatus(this.status, DONATE_CERT);
         this.status = DONATE_CERT;
-        return SupplyProjectLog.of(this, SupplyProjectLogTypeEnum.GRANTEE_CONFIRM);
+        return SupplyProjectLog.of(this, SupplyProjectLogTypeEnum.GRANTEE_RECEIVED, fileIds);
     }
 
     /**
      * 受捐方开具上传了证明
      * 状态转变为 DONE 捐赠完成
+     * @param fileIds 捐献证明
      * @return
      */
     public SupplyProjectLog donateCert(List<Long> fileIds) {
