@@ -10,11 +10,9 @@ import com.qcloud.cos.model.*;
 import com.qcloud.cos.region.Region;
 import lombok.Getter;
 import org.joda.time.DateTime;
-import org.joda.time.Duration;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,8 +22,8 @@ import java.util.Objects;
  * @author mtage
  * @since 2020/1/27 18:24
  */
-public class CorsUtilFactory {
-    private static CorsUtil corsUtil;
+public class CosUtilFactory {
+    private static CosUtil cosUtil;
 
     /**
      * 获取对象存储工具实例
@@ -36,14 +34,14 @@ public class CorsUtilFactory {
      * @return
      * @throws IOException 存储桶未找到
      */
-    public static synchronized CorsUtil getInstance(String secretId, String secretKey, String bucketName, String regionName) throws IOException {
-        if (Objects.isNull(corsUtil)) {
-            corsUtil = new CorsUtil(secretId, secretKey, bucketName, regionName);
+    public static synchronized CosUtil getInstance(String secretId, String secretKey, String bucketName, String regionName) throws IOException {
+        if (Objects.isNull(cosUtil)) {
+            cosUtil = new CosUtil(secretId, secretKey, bucketName, regionName);
         }
-        return corsUtil;
+        return cosUtil;
     }
 
-    public static class CorsUtil {
+    public static class CosUtil {
         @Getter
         private String secretId;
         @Getter
@@ -59,7 +57,7 @@ public class CorsUtilFactory {
 
         public Bucket goalBucket;
 
-        public CorsUtil(String secretId, String secretKey, String bucketName, String regionName) throws IOException {
+        public CosUtil(String secretId, String secretKey, String bucketName, String regionName) throws IOException {
             this.secretId = secretId;
             this.secretKey = secretKey;
             this.bucketName = bucketName;
@@ -67,7 +65,7 @@ public class CorsUtilFactory {
             init();
         }
 
-        private CorsUtil() {
+        private CosUtil() {
         }
 
         public void init() throws IOException {

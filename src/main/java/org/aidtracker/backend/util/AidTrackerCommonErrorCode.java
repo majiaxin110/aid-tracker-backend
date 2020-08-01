@@ -27,7 +27,7 @@ public enum AidTrackerCommonErrorCode {
     /**
      * 对象存储连接异常
      */
-    CORS_ERROR("SYSTEM_ERROR"),
+    COS_ERROR("COS_ERROR"),
 
     /**
      * 配置错误

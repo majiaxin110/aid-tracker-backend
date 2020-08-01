@@ -13,7 +13,7 @@ import javax.persistence.Id;
  */
 @Entity
 @Data
-public class CorsFile {
+public class CosFile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long fileId;

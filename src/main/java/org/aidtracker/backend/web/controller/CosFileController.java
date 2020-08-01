@@ -1,10 +1,10 @@
 package org.aidtracker.backend.web.controller;
 
 import io.swagger.annotations.Api;
-import org.aidtracker.backend.domain.CorsFile;
+import org.aidtracker.backend.domain.CosFile;
 import org.aidtracker.backend.util.GlobalAuthUtil;
 import org.aidtracker.backend.util.SimpleResult;
-import org.aidtracker.backend.web.service.CorsFileService;
+import org.aidtracker.backend.web.service.CosFileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,12 +17,12 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @RestController
 @Api("简单文件上传")
-public class CorsFileController {
+public class CosFileController {
     @Autowired
-    CorsFileService corsFileService;
+    CosFileService cosFileService;
 
-    @PostMapping("/cors-file")
-    public SimpleResult<CorsFile> upload(MultipartFile file, @RequestParam(required = false) String comment) {
-        return SimpleResult.success(corsFileService.uploadToQcloud(file, comment, GlobalAuthUtil.authedAccount()));
+    @PostMapping("/cos-file")
+    public SimpleResult<CosFile> upload(MultipartFile file, @RequestParam(required = false) String comment) {
+        return SimpleResult.success(cosFileService.uploadToQcloud(file, comment, GlobalAuthUtil.authedAccount()));
     }
 }
