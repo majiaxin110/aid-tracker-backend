@@ -29,10 +29,12 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 @Slf4j
 public class AccountEnvBaseTest extends BaseTest {
-    protected final static String testAccountName = "Eyjafjalla";
-    protected final static String testOpenId = "test-70G52s8v3l-bXiPxTGWP-jY7";
-    protected final static AccountRoleEnum testRole = AccountRoleEnum.DONATOR;
-    protected static Account testAccount;
+    protected final static String testDonatorAccountName = "Eyjafjalla";
+    protected final static String testGranteeAccountName = "黑泽朋世";
+    protected final static String testDonatorOpenId = "test-donator52s8v3l-bXiPxTGWP-jY7";
+    protected final static String testGranteeOpenId = "test-grantee42s8v3l-bXiPxTGWP-jY6";
+    protected static Account testDonatorAccount;
+    protected static Account testGranteeAccount;
 
     @Autowired
     protected AccountRepository accountRepository;
@@ -44,24 +46,36 @@ public class AccountEnvBaseTest extends BaseTest {
     WechatAuthService wechatAuthService;
 
     static {
-        testAccount = new Account();
-        testAccount.setName(testAccountName);
-        testAccount.setWechatOpenId(testOpenId);
-        testAccount.setRole(testRole);
+        testDonatorAccount = new Account();
+        testDonatorAccount.setName(testDonatorAccountName);
+        testDonatorAccount.setWechatOpenId(testDonatorOpenId);
+        testDonatorAccount.setRole(AccountRoleEnum.DONATOR);
+
+        testGranteeAccount = new Account();
+        testGranteeAccount.setName(testGranteeAccountName);
+        testGranteeAccount.setWechatOpenId(testGranteeOpenId);
+        testGranteeAccount.setRole(AccountRoleEnum.GRANTEE);
     }
 
     @BeforeEach
     public void setUpTestAccount() {
-        Account existAccount = accountRepository.findByWechatOpenIdAndRole(testOpenId, testRole);
-        if (Objects.isNull(existAccount)) {
-            testAccount = accountRepository.save(testAccount);
-        }
+        testDonatorAccount = saveTestAccount(testDonatorAccount);
+        testGranteeAccount = saveTestAccount(testGranteeAccount);
 
-        when(wechatAuthService.auth(anyString())).thenReturn(testOpenId);
+        when(wechatAuthService.auth(anyString())).thenReturn(testDonatorOpenId);
 
         UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(testAccount, null,
-                        List.of(new SimpleGrantedAuthority(testRole.name())));
+                new UsernamePasswordAuthenticationToken(testDonatorAccount, null,
+                        List.of(new SimpleGrantedAuthority(AccountRoleEnum.DONATOR.name())));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+
+    public void setUpGranteeEnv() {
+        when(wechatAuthService.auth(anyString())).thenReturn(testGranteeOpenId);
+
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(testGranteeAccount, null,
+                        List.of(new SimpleGrantedAuthority(AccountRoleEnum.GRANTEE.name())));
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
@@ -75,5 +89,13 @@ public class AccountEnvBaseTest extends BaseTest {
 
     public void printResult(Object object) throws JsonProcessingException {
         log.warn(objectMapper.writeValueAsString(object));
+    }
+
+    private Account saveTestAccount(Account account) {
+        Account existAccount = accountRepository.findByWechatOpenIdAndRole(account.getWechatOpenId(), account.getRole());
+        if (Objects.isNull(existAccount)) {
+            return accountRepository.save(account);
+        }
+        return existAccount;
     }
 }

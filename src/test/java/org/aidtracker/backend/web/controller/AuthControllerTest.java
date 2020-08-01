@@ -27,7 +27,7 @@ class AuthControllerTest extends AccountEnvBaseTest {
         SimpleResult<?> result = authController.tryLogin("anyCode", null);
         log.warn(objectMapper.writeValueAsString(result));
 
-        result = authController.tryLogin("anyCode", testRole);
+        result = authController.tryLogin("anyCode", AccountRoleEnum.DONATOR);
         assertNotNull(result.getResult());
         log.warn(objectMapper.writeValueAsString(result));
 

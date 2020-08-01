@@ -1,9 +1,13 @@
 package org.aidtracker.backend.web.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.aidtracker.backend.dao.DemandRepository;
+import org.aidtracker.backend.dao.SupplyProjectLogRepository;
 import org.aidtracker.backend.dao.SupplyProjectRepository;
 import org.aidtracker.backend.domain.account.Account;
+import org.aidtracker.backend.domain.demand.Demand;
 import org.aidtracker.backend.domain.supply.SupplyProject;
+import org.aidtracker.backend.domain.supply.SupplyProjectLog;
 import org.aidtracker.backend.domain.supply.SupplyProjectStatusEnum;
 import org.aidtracker.backend.util.AidTrackerCommonErrorCode;
 import org.aidtracker.backend.util.CommonSysException;
@@ -12,6 +16,7 @@ import org.aidtracker.backend.web.dto.SupplyProjectDTO;
 import org.aidtracker.backend.web.dto.SupplyProjectUpdateRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
 import java.util.Objects;
@@ -26,9 +31,15 @@ import java.util.Objects;
 public class SupplyProjectService {
     private final SupplyProjectRepository supplyProjectRepository;
 
+    private final SupplyProjectLogRepository supplyProjectLogRepository;
+
+    private final DemandRepository demandRepository;
+
     @Autowired
-    public SupplyProjectService(SupplyProjectRepository supplyProjectRepository) {
+    public SupplyProjectService(SupplyProjectRepository supplyProjectRepository, SupplyProjectLogRepository supplyProjectLogRepository, DemandRepository demandRepository) {
         this.supplyProjectRepository = supplyProjectRepository;
+        this.supplyProjectLogRepository = supplyProjectLogRepository;
+        this.demandRepository = demandRepository;
     }
 
     public SupplyProjectDTO create(SupplyProjectCreateRequest request, Account account) {
@@ -41,6 +52,7 @@ public class SupplyProjectService {
         supplyProject.setAddress(request.getAddress());
         supplyProject.setApplyTime(ZonedDateTime.now());
         supplyProject.setContact(request.getContact());
+        supplyProject.setGoods(request.getGoods());
         supplyProject.setComment(request.getComment());
 
         supplyProject = supplyProjectRepository.save(supplyProject);
@@ -62,6 +74,24 @@ public class SupplyProjectService {
         supplyProject = supplyProjectRepository.save(supplyProject);
 
         return SupplyProjectDTO.fromSupplyProject(supplyProject, account);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void granteeAgree(long supplyProjectId, Account granteeAccount) {
+        SupplyProject supplyProject = supplyProjectRepository.findById(supplyProjectId).orElseThrow(() ->
+                new CommonSysException(AidTrackerCommonErrorCode.NOT_FOUND.getErrorCode(), "未找到对应捐赠项目"));
+        Demand demand = demandRepository.findById(supplyProject.getDemandId()).orElseThrow(() ->
+                new CommonSysException(AidTrackerCommonErrorCode.SYSTEM_ERROR.getErrorCode(), "捐赠项目无正确关联的需求 " + supplyProjectId));
+        if (demand.getAccountId() != granteeAccount.getAccountId()) {
+            throw new CommonSysException(AidTrackerCommonErrorCode.FORBIDDEN.getErrorCode(), "无该项目权限");
+        }
+
+        SupplyProjectLog projectLog = supplyProject.granteeAgreed(granteeAccount);
+        demand.confirm(supplyProject);
+
+        supplyProjectRepository.save(supplyProject);
+        supplyProjectLogRepository.save(projectLog);
+        demandRepository.save(demand);
     }
 
 }

@@ -90,7 +90,7 @@ public class Demand {
     private String comment;
 
     /**
-     * 该需求可以减去一个捐赠项目的数量
+     * 受捐方同意捐赠 该需求可以减去一个捐赠项目的数量
      * 若减去该项目后需求完全满足，本需求状态将被设置为已完成
      * @param supplyProject
      */

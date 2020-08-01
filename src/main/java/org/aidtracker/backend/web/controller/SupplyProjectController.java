@@ -10,10 +10,7 @@ import org.aidtracker.backend.web.dto.SupplyProjectUpdateRequest;
 import org.aidtracker.backend.web.service.SupplyProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author mtage
@@ -40,5 +37,12 @@ public class SupplyProjectController {
     @PreAuthorize("hasAnyAuthority('DONATOR')")
     public SimpleResult<SupplyProjectDTO> update(@RequestBody @ApiParam("SupplyProjectUpdateRequest") SupplyProjectUpdateRequest request) {
         return SimpleResult.success(supplyProjectService.update(request, GlobalAuthUtil.authedAccount()));
+    }
+
+    @ApiOperation("受捐方同意捐赠一个项目")
+    @PostMapping("/supply-project/grantee-agree")
+    public SimpleResult<String> granteeAgree(@RequestParam long supplyProjectId) {
+        supplyProjectService.granteeAgree(supplyProjectId, GlobalAuthUtil.authedAccount());
+        return SimpleResult.success("true");
     }
 }

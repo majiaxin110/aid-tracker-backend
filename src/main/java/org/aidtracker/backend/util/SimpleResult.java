@@ -29,11 +29,17 @@ public class SimpleResult<T> implements Serializable {
 
     private T result;
 
+    private static final String OK = "OK";
+
     public static <T> SimpleResult<T> success(T result) {
         SimpleResult<T> simpleResult = new SimpleResult<>();
         simpleResult.setSuccess(true);
         simpleResult.setResult(result);
         return simpleResult;
+    }
+
+    public static SimpleResult<String> ok() {
+        return success(OK);
     }
 
     public static <T> SimpleResult<T> fail(String errorCode, String errorMsg) {

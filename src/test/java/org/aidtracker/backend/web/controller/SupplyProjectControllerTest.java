@@ -7,18 +7,18 @@ import org.aidtracker.backend.dao.SupplyProjectRepository;
 import org.aidtracker.backend.domain.DeliverAddress;
 import org.aidtracker.backend.domain.Goods;
 import org.aidtracker.backend.domain.supply.SupplyDeliverMethodEnum;
+import org.aidtracker.backend.domain.supply.SupplyProject;
+import org.aidtracker.backend.domain.supply.SupplyProjectStatusEnum;
 import org.aidtracker.backend.util.SimpleResult;
-import org.aidtracker.backend.web.dto.AccountDTO;
 import org.aidtracker.backend.web.dto.SupplyProjectCreateRequest;
 import org.aidtracker.backend.web.dto.SupplyProjectDTO;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author mtage
@@ -31,7 +31,7 @@ class SupplyProjectControllerTest extends AccountEnvBaseTest {
     SupplyProjectController supplyProjectController;
 
     @Autowired
-    SupplyProjectRepository repository;
+    SupplyProjectRepository supplyProjectRepository;
 
     @Test
     void create() throws JsonProcessingException {
@@ -48,8 +48,36 @@ class SupplyProjectControllerTest extends AccountEnvBaseTest {
         assertNotNull(result);
         Long supplyProjectId = result.getResult().getSupplyProjectId();
         assertNotNull(supplyProjectId);
-        assertNotNull(repository.findById(supplyProjectId));
+        assertNotNull(supplyProjectRepository.findById(supplyProjectId));
 
         printResult(result);
+    }
+
+
+    @Test
+    void update() {
+    }
+
+    @Test
+    void granteeAgree() throws JsonProcessingException {
+        Goods goods = new Goods("蓝光盘", "BD", "Kyoto Animation", "套");
+        SupplyProjectCreateRequest request = new SupplyProjectCreateRequest();
+        request.setGoods(goods);
+        request.setAddress(new DeliverAddress("200000", "上海黄浦江"));
+        request.setDemandId(2L);
+        request.setDeliverMethod(SupplyDeliverMethodEnum.DONATOR);
+        request.setAmount(BigDecimal.TEN);
+        SimpleResult<SupplyProjectDTO> createResult = supplyProjectController.create(request);
+        Long supplyProjectId = createResult.getResult().getSupplyProjectId();
+
+        setUpGranteeEnv();
+
+        SimpleResult<String> result = supplyProjectController.granteeAgree(supplyProjectId);
+        assertNotNull(result);
+        assertTrue(result.getSuccess());
+        printResult(result);
+
+        SupplyProject supplyProject = supplyProjectRepository.findById(supplyProjectId).orElseThrow();
+        assertEquals(supplyProject.getStatus(), SupplyProjectStatusEnum.GRANTEE_REPLY);
     }
 }

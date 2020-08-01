@@ -101,13 +101,14 @@ public class DemandService {
     }
 
     /**
-     * 单个账户全部的需求
+     * 单个账户全部的需求 不包含已关闭（删除）的需求
      * @param account
      * @return 按需求状态分
      */
     public Map<DemandStatusEnum, List<DemandWithSupplyDTO>> allDemandByAccount(Account account) {
         List<Demand> allDemand = demandRepository.findAllByAccountId(account.getAccountId());
         return allDemand.stream()
+                .filter(demand -> demand.getStatus() != DemandStatusEnum.CLOSED)
                 .sorted(Comparator.comparing(Demand::getPublishTime).reversed())
                 .map(this::buildDemandWithSupplyProjectInfo)
                 .collect(Collectors.groupingBy(dto -> dto.getDemand().getStatus(), Collectors.toList()));
