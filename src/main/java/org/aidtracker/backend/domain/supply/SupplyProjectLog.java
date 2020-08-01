@@ -34,20 +34,21 @@ public class SupplyProjectLog {
     @Convert(converter = SimpleStringListConverter.class)
     private List<Long> fileIds;
 
-    public static SupplyProjectLog of() {
+    private static SupplyProjectLog of(long supplyProjectId) {
         SupplyProjectLog projectLog = new SupplyProjectLog();
         projectLog.setTime(ZonedDateTime.now());
+        projectLog.setSupplyProjectId(supplyProjectId);
         return projectLog;
     }
 
-    public static SupplyProjectLog of(SupplyProjectLogTypeEnum logType) {
-        SupplyProjectLog projectLog = of();
+    public static SupplyProjectLog of(SupplyProject supplyProject, SupplyProjectLogTypeEnum logType) {
+        SupplyProjectLog projectLog = of(supplyProject.getSupplyProjectId());
         projectLog.setLogType(logType);
         return projectLog;
     }
 
-    public static SupplyProjectLog of(SupplyProjectLogTypeEnum logType, List<Long> fileIds) {
-        SupplyProjectLog projectLog = of(logType);
+    public static SupplyProjectLog of(SupplyProject supplyProject, SupplyProjectLogTypeEnum logType, List<Long> fileIds) {
+        SupplyProjectLog projectLog = of(supplyProject, logType);
         projectLog.setFileIds(fileIds);
         return projectLog;
     }

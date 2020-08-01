@@ -1,22 +1,27 @@
 package org.aidtracker.backend.web.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.aidtracker.backend.AccountEnvBaseTest;
+import org.aidtracker.backend.dao.DeliverPeriodRepository;
 import org.aidtracker.backend.dao.SupplyProjectRepository;
+import org.aidtracker.backend.domain.Contact;
+import org.aidtracker.backend.domain.ContactTypeEnum;
 import org.aidtracker.backend.domain.DeliverAddress;
 import org.aidtracker.backend.domain.Goods;
-import org.aidtracker.backend.domain.supply.SupplyDeliverMethodEnum;
-import org.aidtracker.backend.domain.supply.SupplyProject;
-import org.aidtracker.backend.domain.supply.SupplyProjectStatusEnum;
+import org.aidtracker.backend.domain.supply.*;
 import org.aidtracker.backend.util.SimpleResult;
+import org.aidtracker.backend.web.dto.DispatchRequest;
 import org.aidtracker.backend.web.dto.SupplyProjectCreateRequest;
 import org.aidtracker.backend.web.dto.SupplyProjectDTO;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -32,6 +37,9 @@ class SupplyProjectControllerTest extends AccountEnvBaseTest {
 
     @Autowired
     SupplyProjectRepository supplyProjectRepository;
+
+    @Autowired
+    DeliverPeriodRepository deliverPeriodRepository;
 
     @Test
     void create() throws JsonProcessingException {
@@ -78,6 +86,48 @@ class SupplyProjectControllerTest extends AccountEnvBaseTest {
         printResult(result);
 
         SupplyProject supplyProject = supplyProjectRepository.findById(supplyProjectId).orElseThrow();
-        assertEquals(supplyProject.getStatus(), SupplyProjectStatusEnum.GRANTEE_REPLY);
+        assertEquals(SupplyProjectStatusEnum.GRANTEE_REPLY, supplyProject.getStatus());
+    }
+
+    @Test
+    void donatorDispatch() throws JsonProcessingException {
+        Goods goods = new Goods("蓝光盘", "BD", "Kyoto Animation", "套");
+        SupplyProjectCreateRequest request = new SupplyProjectCreateRequest();
+        request.setGoods(goods);
+        request.setAddress(new DeliverAddress("200000", "上海黄浦江"));
+        request.setDemandId(2L);
+        request.setDeliverMethod(SupplyDeliverMethodEnum.DONATOR);
+        request.setAmount(BigDecimal.TEN);
+        SimpleResult<SupplyProjectDTO> createResult = supplyProjectController.create(request);
+        Long supplyProjectId = createResult.getResult().getSupplyProjectId();
+
+        setUpGranteeEnv();
+
+        SimpleResult<String> agreeResult = supplyProjectController.granteeAgree(supplyProjectId);
+        checkAndPrint(agreeResult);
+
+        setUpDonatorEnv();
+
+        DispatchRequest dispatchRequest = new DispatchRequest();
+        dispatchRequest.setSupplyProjectId(supplyProjectId);
+        DispatchRequest.DeliverPeriodInfo deliverPeriodInfoA = DispatchRequest.DeliverPeriodInfo.builder()
+                .periodType(DeliverPeriodTypeEnum.EXPRESS)
+                .trackingNum(RandomStringUtils.random(20))
+                .build();
+        DispatchRequest.DeliverPeriodInfo deliverPeriodInfoB = DispatchRequest.DeliverPeriodInfo.builder()
+                .periodType(DeliverPeriodTypeEnum.DIY)
+                .trackingNum(RandomStringUtils.random(20))
+                .contact(new Contact("企鹅物流", ContactTypeEnum.PHONE, "110"))
+                .build();
+        dispatchRequest.setDeliverPeriodList(Lists.newArrayList(deliverPeriodInfoA, deliverPeriodInfoB));
+
+        SimpleResult<String> result = supplyProjectController.donatorDispatch(dispatchRequest);
+        checkAndPrint(result);
+
+        SupplyProject supplyProject = supplyProjectRepository.findById(supplyProjectId).get();
+        assertEquals(SupplyProjectStatusEnum.LOGISTICS_TRACKING, supplyProject.getStatus());
+
+        List<DeliverPeriod> deliverPeriodList = deliverPeriodRepository.findAllBySupplyProjectId(supplyProjectId);
+        assertEquals(2, deliverPeriodList.size());
     }
 }

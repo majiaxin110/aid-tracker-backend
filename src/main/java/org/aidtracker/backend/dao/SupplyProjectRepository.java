@@ -4,6 +4,7 @@ import org.aidtracker.backend.domain.supply.SupplyProject;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author mtage
@@ -14,5 +15,6 @@ public interface SupplyProjectRepository extends JpaRepository<SupplyProject, Lo
 
     List<SupplyProject> findAllByAccountId(long accountId);
 
-    SupplyProject findBySupplyProjectIdAndAccountId(long supplyProjectId, long accountId);
+    Optional<SupplyProject> findBySupplyProjectIdAndAccountId(long supplyProjectId, long accountId);
+
 }

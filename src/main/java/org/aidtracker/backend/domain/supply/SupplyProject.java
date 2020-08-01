@@ -80,7 +80,7 @@ public class SupplyProject {
     public SupplyProjectLog granteeAgreed(Account grantee) {
         verifyStatus(this.status, GRANTEE_REPLY);
         this.status = GRANTEE_REPLY;
-        return SupplyProjectLog.of(SupplyProjectLogTypeEnum.GRANTEE_AGREE);
+        return SupplyProjectLog.of(this, SupplyProjectLogTypeEnum.GRANTEE_AGREE);
     }
 
     /**
@@ -96,7 +96,7 @@ public class SupplyProject {
         }
         verifyStatus(this.status, LOGISTICS_TRACKING);
         this.status = LOGISTICS_TRACKING;
-        return SupplyProjectLog.of(SupplyProjectLogTypeEnum.DISPATCH);
+        return SupplyProjectLog.of(this, SupplyProjectLogTypeEnum.DISPATCH);
     }
 
     /**
@@ -107,7 +107,7 @@ public class SupplyProject {
     public SupplyProjectLog granteeConfirm() {
         verifyStatus(this.status, DONATE_CERT);
         this.status = DONATE_CERT;
-        return SupplyProjectLog.of(SupplyProjectLogTypeEnum.GRANTEE_CONFIRM);
+        return SupplyProjectLog.of(this, SupplyProjectLogTypeEnum.GRANTEE_CONFIRM);
     }
 
     /**
@@ -118,7 +118,7 @@ public class SupplyProject {
     public SupplyProjectLog donateCert(List<Long> fileIds) {
         verifyStatus(this.status, DONE);
         this.status = DONE;
-        return SupplyProjectLog.of(SupplyProjectLogTypeEnum.DONATE_CERT, fileIds);
+        return SupplyProjectLog.of(this, SupplyProjectLogTypeEnum.DONATE_CERT, fileIds);
     }
 
 }

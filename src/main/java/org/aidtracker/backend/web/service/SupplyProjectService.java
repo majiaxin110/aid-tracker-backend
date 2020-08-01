@@ -1,16 +1,19 @@
 package org.aidtracker.backend.web.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.aidtracker.backend.dao.DeliverPeriodRepository;
 import org.aidtracker.backend.dao.DemandRepository;
 import org.aidtracker.backend.dao.SupplyProjectLogRepository;
 import org.aidtracker.backend.dao.SupplyProjectRepository;
 import org.aidtracker.backend.domain.account.Account;
 import org.aidtracker.backend.domain.demand.Demand;
+import org.aidtracker.backend.domain.supply.DeliverPeriod;
 import org.aidtracker.backend.domain.supply.SupplyProject;
 import org.aidtracker.backend.domain.supply.SupplyProjectLog;
 import org.aidtracker.backend.domain.supply.SupplyProjectStatusEnum;
 import org.aidtracker.backend.util.AidTrackerCommonErrorCode;
 import org.aidtracker.backend.util.CommonSysException;
+import org.aidtracker.backend.web.dto.DispatchRequest;
 import org.aidtracker.backend.web.dto.SupplyProjectCreateRequest;
 import org.aidtracker.backend.web.dto.SupplyProjectDTO;
 import org.aidtracker.backend.web.dto.SupplyProjectUpdateRequest;
@@ -19,7 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
-import java.util.Objects;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 捐赠项目相关
@@ -35,11 +39,14 @@ public class SupplyProjectService {
 
     private final DemandRepository demandRepository;
 
+    private final DeliverPeriodRepository deliverPeriodRepository;
+
     @Autowired
-    public SupplyProjectService(SupplyProjectRepository supplyProjectRepository, SupplyProjectLogRepository supplyProjectLogRepository, DemandRepository demandRepository) {
+    public SupplyProjectService(SupplyProjectRepository supplyProjectRepository, SupplyProjectLogRepository supplyProjectLogRepository, DemandRepository demandRepository, DeliverPeriodRepository deliverPeriodRepository) {
         this.supplyProjectRepository = supplyProjectRepository;
         this.supplyProjectLogRepository = supplyProjectLogRepository;
         this.demandRepository = demandRepository;
+        this.deliverPeriodRepository = deliverPeriodRepository;
     }
 
     public SupplyProjectDTO create(SupplyProjectCreateRequest request, Account account) {
@@ -61,11 +68,7 @@ public class SupplyProjectService {
     }
 
     public SupplyProjectDTO update(SupplyProjectUpdateRequest request, Account account) {
-        SupplyProject supplyProject = supplyProjectRepository.findBySupplyProjectIdAndAccountId(request.getSupplyProjectId(),
-                account.getAccountId());
-        if (Objects.isNull(supplyProject)) {
-            throw new CommonSysException(AidTrackerCommonErrorCode.INVALID_PARAM.getErrorCode(), "不存在的捐赠项目id");
-        }
+        SupplyProject supplyProject = findProjectByIdAccount(request.getSupplyProjectId(), account);
         supplyProject.setDeliverMethod(request.getDeliverMethod());
         supplyProject.setAddress(request.getAddress());
         supplyProject.setContact(request.getContact());
@@ -92,6 +95,29 @@ public class SupplyProjectService {
         supplyProjectRepository.save(supplyProject);
         supplyProjectLogRepository.save(projectLog);
         demandRepository.save(demand);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void donatorDispatch(DispatchRequest request, Account donatorAccount) {
+        SupplyProject supplyProject = findProjectByIdAccount(request.getSupplyProjectId(), donatorAccount);
+        List<DeliverPeriod> deliverPeriodList = request.getDeliverPeriodList().stream().map(p -> {
+            DeliverPeriod deliverPeriod = new DeliverPeriod();
+            deliverPeriod.setContact(p.getContact());
+            deliverPeriod.setPeriodType(p.getPeriodType());
+            deliverPeriod.setTrackingNum(p.getTrackingNum());
+            deliverPeriod.setSupplyProjectId(supplyProject.getSupplyProjectId());
+            deliverPeriodRepository.save(deliverPeriod);
+            return deliverPeriod;
+        }).collect(Collectors.toList());
+        SupplyProjectLog projectLog = supplyProject.dispatch(deliverPeriodList);
+
+        supplyProjectRepository.save(supplyProject);
+        supplyProjectLogRepository.save(projectLog);
+    }
+
+    private SupplyProject findProjectByIdAccount(long supplyProjectId, Account donatorAccount) {
+        return supplyProjectRepository.findBySupplyProjectIdAndAccountId(supplyProjectId,
+                donatorAccount.getAccountId()).orElseThrow(() -> new CommonSysException(AidTrackerCommonErrorCode.INVALID_PARAM.getErrorCode(), "不存在的捐赠项目id"));
     }
 
 }

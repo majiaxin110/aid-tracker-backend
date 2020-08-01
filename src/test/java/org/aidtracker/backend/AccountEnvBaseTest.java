@@ -6,7 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.aidtracker.backend.dao.AccountRepository;
 import org.aidtracker.backend.domain.account.Account;
 import org.aidtracker.backend.domain.account.AccountRoleEnum;
+import org.aidtracker.backend.util.SimpleResult;
 import org.aidtracker.backend.web.service.WechatAuthService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -79,6 +81,15 @@ public class AccountEnvBaseTest extends BaseTest {
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
+    public void setUpDonatorEnv() {
+        when(wechatAuthService.auth(anyString())).thenReturn(testDonatorOpenId);
+
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(testDonatorAccount, null,
+                        List.of(new SimpleGrantedAuthority(AccountRoleEnum.DONATOR.name())));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+
 //    @AfterEach
 //    public void clearTestAccount() {
 //        Account existAccount = accountRepository.getByWechatOpenIdAndRole(testOpenId, testRole);
@@ -89,6 +100,13 @@ public class AccountEnvBaseTest extends BaseTest {
 
     public void printResult(Object object) throws JsonProcessingException {
         log.warn(objectMapper.writeValueAsString(object));
+    }
+
+    public void checkAndPrint(SimpleResult<?> result) throws JsonProcessingException {
+        Assertions.assertNotNull(result);
+        Assertions.assertTrue(result.getSuccess());
+
+        printResult(result);
     }
 
     private Account saveTestAccount(Account account) {
