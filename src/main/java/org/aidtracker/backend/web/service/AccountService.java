@@ -3,6 +3,8 @@ package org.aidtracker.backend.web.service;
 import org.aidtracker.backend.dao.AccountRepository;
 import org.aidtracker.backend.domain.account.Account;
 import org.aidtracker.backend.domain.account.AccountRoleEnum;
+import org.aidtracker.backend.util.AidTrackerCommonErrorCode;
+import org.aidtracker.backend.util.CommonSysException;
 import org.aidtracker.backend.util.JwtTokenUtil;
 import org.aidtracker.backend.web.dto.AccountDTO;
 import org.aidtracker.backend.web.dto.AccountRegisterRequest;
@@ -88,6 +90,11 @@ public class AccountService {
         accountRepository.save(account);
 
         return AccountDTO.fromAccount(account);
+    }
+
+    public Account getById(long accountId) {
+        return accountRepository.findById(accountId).orElseThrow(() -> new CommonSysException(AidTrackerCommonErrorCode.NOT_FOUND.getErrorCode(),
+                "不存在的账户 " + accountId));
     }
 
 }

@@ -1,10 +1,7 @@
 package org.aidtracker.backend.web.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.aidtracker.backend.dao.DeliverPeriodRepository;
-import org.aidtracker.backend.dao.DemandRepository;
-import org.aidtracker.backend.dao.SupplyProjectLogRepository;
-import org.aidtracker.backend.dao.SupplyProjectRepository;
+import org.aidtracker.backend.dao.*;
 import org.aidtracker.backend.domain.account.Account;
 import org.aidtracker.backend.domain.demand.Demand;
 import org.aidtracker.backend.domain.supply.DeliverPeriod;
@@ -19,7 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -38,12 +37,16 @@ public class SupplyProjectService {
 
     private final DeliverPeriodRepository deliverPeriodRepository;
 
+    private final AccountService accountService;
+
     @Autowired
-    public SupplyProjectService(SupplyProjectRepository supplyProjectRepository, SupplyProjectLogRepository supplyProjectLogRepository, DemandRepository demandRepository, DeliverPeriodRepository deliverPeriodRepository) {
+    public SupplyProjectService(SupplyProjectRepository supplyProjectRepository, SupplyProjectLogRepository supplyProjectLogRepository,
+                                DemandRepository demandRepository, DeliverPeriodRepository deliverPeriodRepository, AccountService accountService) {
         this.supplyProjectRepository = supplyProjectRepository;
         this.supplyProjectLogRepository = supplyProjectLogRepository;
         this.demandRepository = demandRepository;
         this.deliverPeriodRepository = deliverPeriodRepository;
+        this.accountService = accountService;
     }
 
     public SupplyProjectDTO create(SupplyProjectCreateRequest request, Account account) {
@@ -74,6 +77,29 @@ public class SupplyProjectService {
         supplyProject = supplyProjectRepository.save(supplyProject);
 
         return SupplyProjectDTO.fromSupplyProject(supplyProject, account);
+    }
+
+    /**
+     * 根据id查询单个捐赠项目信息 将校验相关权限
+     * @param supplyProjectId
+     * @param account
+     * @return
+     */
+    public SupplyProjectDTO getById(long supplyProjectId, Account account) {
+        SupplyProject supplyProject = findById(supplyProjectId);
+        if (supplyProject.getAccountId() == account.getAccountId()) {
+            return SupplyProjectDTO.fromSupplyProject(supplyProject, account);
+        } else {
+            findGranteeDemand(supplyProject, account);
+            return SupplyProjectDTO.fromSupplyProject(supplyProject, accountService.getById(supplyProject.getAccountId()));
+        }
+    }
+
+    public Map<SupplyProjectStatusEnum, List<SupplyProjectDTO>> allSupplyProjectByAccount(Account account) {
+        return supplyProjectRepository.findAllByAccountId(account.getAccountId()).stream()
+                .sorted(Comparator.comparing(SupplyProject::getApplyTime).reversed())
+                .map(s -> SupplyProjectDTO.fromSupplyProject(s, account))
+                .collect(Collectors.groupingBy(SupplyProjectDTO::getStatus, Collectors.toList()));
     }
 
     @Transactional(rollbackFor = Exception.class)

@@ -2,6 +2,7 @@ package org.aidtracker.backend.web.controller;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.aidtracker.backend.domain.supply.SupplyProjectStatusEnum;
 import org.aidtracker.backend.util.GlobalAuthUtil;
 import org.aidtracker.backend.util.SimpleResult;
 import org.aidtracker.backend.web.dto.*;
@@ -9,6 +10,9 @@ import org.aidtracker.backend.web.service.SupplyProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author mtage
@@ -35,6 +39,19 @@ public class SupplyProjectController {
     @PreAuthorize("hasAnyAuthority('DONATOR')")
     public SimpleResult<SupplyProjectDTO> update(@RequestBody @ApiParam("SupplyProjectUpdateRequest") SupplyProjectUpdateRequest request) {
         return SimpleResult.success(supplyProjectService.update(request, GlobalAuthUtil.authedAccount()));
+    }
+
+    @ApiOperation("查询 捐赠项目")
+    @GetMapping("/supply-project")
+    public SimpleResult<SupplyProjectDTO> getById(@RequestParam long supplyProjectId) {
+        return SimpleResult.success(supplyProjectService.getById(supplyProjectId, GlobalAuthUtil.authedAccount()));
+    }
+
+    @ApiOperation("用户全部捐赠项目列表")
+    @GetMapping("/supply-project/list/self")
+    @PreAuthorize("hasAnyAuthority('DONATOR')")
+    public SimpleResult<Map<SupplyProjectStatusEnum, List<SupplyProjectDTO>>> getAllSupplyProjectByAccount() {
+        return SimpleResult.success(supplyProjectService.allSupplyProjectByAccount(GlobalAuthUtil.authedAccount()));
     }
 
     @ApiOperation("受捐方同意捐赠一个项目")
