@@ -1,5 +1,6 @@
 package org.aidtracker.backend.web.service;
 
+import org.aidtracker.backend.dao.SupplyProjectLogRepository;
 import org.aidtracker.backend.dao.SupplyProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,10 +12,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class SupplyProjectTrackService {
     private final SupplyProjectRepository supplyProjectRepository;
+    private final SupplyProjectLogRepository supplyProjectLogRepository;
 
     @Autowired
-    public SupplyProjectTrackService(SupplyProjectRepository supplyProjectRepository) {
+    public SupplyProjectTrackService(SupplyProjectRepository supplyProjectRepository, SupplyProjectLogRepository supplyProjectLogRepository) {
         this.supplyProjectRepository = supplyProjectRepository;
+        this.supplyProjectLogRepository = supplyProjectLogRepository;
     }
 
 
