@@ -68,7 +68,7 @@ public class SupplyProjectService {
     }
 
     public SupplyProjectDTO update(SupplyProjectUpdateRequest request, Account account) {
-        SupplyProject supplyProject = findProjectByIdAccount(request.getSupplyProjectId(), account);
+        SupplyProject supplyProject = findProjectByIdDonator(request.getSupplyProjectId(), account);
         supplyProject.setDeliverMethod(request.getDeliverMethod());
         supplyProject.setAddress(request.getAddress());
         supplyProject.setContact(request.getContact());
@@ -86,11 +86,10 @@ public class SupplyProjectService {
      * @return
      */
     public SupplyProjectDTO getById(long supplyProjectId, Account account) {
-        SupplyProject supplyProject = findById(supplyProjectId);
+        SupplyProject supplyProject = findProjectByIdAccount(supplyProjectId, account);
         if (supplyProject.getAccountId() == account.getAccountId()) {
             return SupplyProjectDTO.fromSupplyProject(supplyProject, account);
         } else {
-            findGranteeDemand(supplyProject, account);
             return SupplyProjectDTO.fromSupplyProject(supplyProject, accountService.getById(supplyProject.getAccountId()));
         }
     }
@@ -120,7 +119,7 @@ public class SupplyProjectService {
 
     @Transactional(rollbackFor = Exception.class)
     public void donatorDispatch(DispatchRequest request, Account donatorAccount) {
-        SupplyProject supplyProject = findProjectByIdAccount(request.getSupplyProjectId(), donatorAccount);
+        SupplyProject supplyProject = findProjectByIdDonator(request.getSupplyProjectId(), donatorAccount);
         List<DeliverPeriod> deliverPeriodList = request.getDeliverPeriodList().stream().map(p -> {
             DeliverPeriod deliverPeriod = new DeliverPeriod();
             deliverPeriod.setContact(p.getContact());
@@ -162,6 +161,19 @@ public class SupplyProjectService {
                 new CommonSysException(AidTrackerCommonErrorCode.NOT_FOUND.getErrorCode(), "未找到对应捐赠项目"));
     }
 
+    public SupplyProject findProjectByIdDonator(long supplyProjectId, Account donatorAccount) {
+        return supplyProjectRepository.findBySupplyProjectIdAndAccountId(supplyProjectId,
+                donatorAccount.getAccountId()).orElseThrow(() -> new CommonSysException(AidTrackerCommonErrorCode.INVALID_PARAM.getErrorCode(), "不存在的捐赠项目id"));
+    }
+
+    public SupplyProject findProjectByIdAccount(long supplyProjectId, Account account) {
+        SupplyProject supplyProject = findById(supplyProjectId);
+        if (supplyProject.getAccountId() != account.getAccountId()) {
+            findGranteeDemand(supplyProject, account);
+        }
+        return supplyProject;
+    }
+
     /**
      * 找到某个捐赠项目所关联的需求
      * @param supplyProject
@@ -176,11 +188,6 @@ public class SupplyProjectService {
             throw new CommonSysException(AidTrackerCommonErrorCode.FORBIDDEN.getErrorCode(), "无该项目权限");
         }
         return demand;
-    }
-
-    private SupplyProject findProjectByIdAccount(long supplyProjectId, Account donatorAccount) {
-        return supplyProjectRepository.findBySupplyProjectIdAndAccountId(supplyProjectId,
-                donatorAccount.getAccountId()).orElseThrow(() -> new CommonSysException(AidTrackerCommonErrorCode.INVALID_PARAM.getErrorCode(), "不存在的捐赠项目id"));
     }
 
 }

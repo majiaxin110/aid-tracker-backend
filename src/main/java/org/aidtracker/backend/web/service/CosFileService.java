@@ -6,6 +6,7 @@ import org.aidtracker.backend.domain.account.Account;
 import org.aidtracker.backend.util.AidTrackerCommonErrorCode;
 import org.aidtracker.backend.util.CommonSysException;
 import org.aidtracker.backend.util.CosUtilFactory;
+import org.aidtracker.backend.web.dto.CosFileDTO;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +66,11 @@ public class CosFileService {
         } catch (IOException e) {
             throw new CommonSysException(AidTrackerCommonErrorCode.COS_ERROR.getErrorCode(), "连接至腾讯云对象存储失败", e);
         }
+    }
+
+    public CosFileDTO getById(long cosFileId) {
+        return CosFileDTO.fromCosFile(cosFileRepository.findById(cosFileId).orElseThrow(() ->
+                new CommonSysException(AidTrackerCommonErrorCode.NOT_FOUND.getErrorCode(), "未找到对象存储文件 " + cosFileId)));
     }
 
 }
