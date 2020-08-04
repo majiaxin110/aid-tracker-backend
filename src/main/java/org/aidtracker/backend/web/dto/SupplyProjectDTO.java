@@ -42,6 +42,9 @@ public class SupplyProjectDTO {
     @ApiModelProperty("备注")
     private String comment;
 
+    @ApiModelProperty("最近一条日志记录")
+    private SupplyProjectLogDTO recentLog;
+
     public static SupplyProjectDTO fromSupplyProject(SupplyProject supplyProject, Account account) {
         SupplyProjectDTO supplyProjectDTO = new SupplyProjectDTO();
         supplyProjectDTO.setSupplyProjectId(supplyProject.getSupplyProjectId());
@@ -55,5 +58,11 @@ public class SupplyProjectDTO {
         supplyProjectDTO.setContact(supplyProject.getContact());
         supplyProjectDTO.setComment(supplyProject.getComment());
         return supplyProjectDTO;
+    }
+
+    public static SupplyProjectDTO fromSupplyProject(SupplyProject supplyProject, SupplyProjectLogDTO recentLog, Account account) {
+        SupplyProjectDTO result = fromSupplyProject(supplyProject, account);
+        result.setRecentLog(recentLog);
+        return result;
     }
 }

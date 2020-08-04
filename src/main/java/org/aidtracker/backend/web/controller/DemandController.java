@@ -5,10 +5,7 @@ import io.swagger.annotations.ApiParam;
 import org.aidtracker.backend.domain.demand.DemandStatusEnum;
 import org.aidtracker.backend.util.GlobalAuthUtil;
 import org.aidtracker.backend.util.SimpleResult;
-import org.aidtracker.backend.web.dto.DemandCreateRequest;
-import org.aidtracker.backend.web.dto.DemandDTO;
-import org.aidtracker.backend.web.dto.DemandUpdateRequest;
-import org.aidtracker.backend.web.dto.DemandWithSupplyDTO;
+import org.aidtracker.backend.web.dto.*;
 import org.aidtracker.backend.web.service.DemandService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -37,10 +34,10 @@ public class DemandController {
         return SimpleResult.success(demandService.allDemand(PageRequest.of(page, size)));
     }
 
-    @ApiOperation("用户全部需求列表")
-    @GetMapping("/demand/list/self")
+    @ApiOperation("需求列表查询")
+    @GetMapping("/demand/list")
     @PreAuthorize("hasAnyAuthority('GRANTEE')")
-    public SimpleResult<Map<DemandStatusEnum, List<DemandWithSupplyDTO>>> getAllDemandByAccount() {
+    public SimpleResult<Map<DemandStatusEnum, List<DemandWithSupplyCountDTO>>> getAllDemandByAccount(@RequestParam DemandListQueryTypeEnum type) {
         return SimpleResult.success(demandService.allDemandByAccount(GlobalAuthUtil.authedAccount()));
     }
 

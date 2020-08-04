@@ -16,6 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 对象存储文件相关服务
@@ -71,6 +73,10 @@ public class CosFileService {
     public CosFileDTO getById(long cosFileId) {
         return CosFileDTO.fromCosFile(cosFileRepository.findById(cosFileId).orElseThrow(() ->
                 new CommonSysException(AidTrackerCommonErrorCode.NOT_FOUND.getErrorCode(), "未找到对象存储文件 " + cosFileId)));
+    }
+
+    public List<CosFileDTO> getByIdList(List<Long> cosFileIdList) {
+        return cosFileIdList.parallelStream().map(this::getById).collect(Collectors.toList());
     }
 
 }

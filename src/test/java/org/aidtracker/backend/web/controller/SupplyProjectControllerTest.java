@@ -5,11 +5,13 @@ import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.aidtracker.backend.AccountEnvBaseTest;
 import org.aidtracker.backend.dao.DeliverPeriodRepository;
+import org.aidtracker.backend.dao.DemandRepository;
 import org.aidtracker.backend.dao.SupplyProjectRepository;
 import org.aidtracker.backend.domain.Contact;
 import org.aidtracker.backend.domain.ContactTypeEnum;
 import org.aidtracker.backend.domain.DeliverAddress;
 import org.aidtracker.backend.domain.Goods;
+import org.aidtracker.backend.domain.demand.Demand;
 import org.aidtracker.backend.domain.supply.*;
 import org.aidtracker.backend.util.SimpleResult;
 import org.aidtracker.backend.web.dto.*;
@@ -20,6 +22,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -38,6 +42,9 @@ class SupplyProjectControllerTest extends AccountEnvBaseTest {
 
     @Autowired
     DeliverPeriodRepository deliverPeriodRepository;
+
+    @Autowired
+    DemandRepository demandRepository;
 
     @Test
     void create() throws JsonProcessingException {
@@ -173,5 +180,20 @@ class SupplyProjectControllerTest extends AccountEnvBaseTest {
         donateCertRequest.setFileIds(Lists.newArrayList(2L, 5L));
         SimpleResult<String> certResult = supplyProjectController.granteeSubmitCert(donateCertRequest);
         checkAndPrint(certResult);
+    }
+
+    @Test
+    void getAllSupplyProjectByAccount() throws JsonProcessingException {
+        setUpDonatorEnv();
+        SimpleResult<Map<SupplyProjectStatusEnum, List<SupplyProjectDTO>>> result = supplyProjectController
+                .getList(SupplyProjectListQueryTypeEnum.SELF, null);
+        checkAndPrint(result);
+
+        setUpGranteeEnv();
+        Optional<Demand> demandOptional = demandRepository.findAllByAccountId(testGranteeAccount.getAccountId()).stream().findFirst();
+        if (demandOptional.isPresent()) {
+            result = supplyProjectController.getList(SupplyProjectListQueryTypeEnum.DEMAND, demandOptional.get().getDemandId());
+            checkAndPrint(result);
+        }
     }
 }

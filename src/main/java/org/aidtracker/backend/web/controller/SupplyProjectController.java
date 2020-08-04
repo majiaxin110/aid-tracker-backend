@@ -3,9 +3,12 @@ package org.aidtracker.backend.web.controller;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.aidtracker.backend.domain.supply.SupplyProjectStatusEnum;
+import org.aidtracker.backend.util.AidTrackerCommonErrorCode;
+import org.aidtracker.backend.util.CommonSysException;
 import org.aidtracker.backend.util.GlobalAuthUtil;
 import org.aidtracker.backend.util.SimpleResult;
 import org.aidtracker.backend.web.dto.*;
+import org.aidtracker.backend.web.service.DemandService;
 import org.aidtracker.backend.web.service.SupplyProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,10 +24,12 @@ import java.util.Map;
 @RestController
 public class SupplyProjectController {
     final SupplyProjectService supplyProjectService;
+    final DemandService demandService;
 
     @Autowired
-    public SupplyProjectController(SupplyProjectService supplyProjectService) {
+    public SupplyProjectController(SupplyProjectService supplyProjectService, DemandService demandService) {
         this.supplyProjectService = supplyProjectService;
+        this.demandService = demandService;
     }
 
     @ApiOperation("新建 捐赠项目")
@@ -43,21 +48,26 @@ public class SupplyProjectController {
 
     @ApiOperation("查询 捐赠项目")
     @GetMapping("/supply-project")
-    public SimpleResult<SupplyProjectDTO> getById(@RequestParam long supplyProjectId) {
+    public SimpleResult<SupplyProjectDTO> getById(@RequestParam Long supplyProjectId) {
         return SimpleResult.success(supplyProjectService.getById(supplyProjectId, GlobalAuthUtil.authedAccount()));
     }
 
-    @ApiOperation("用户全部捐赠项目列表")
-    @GetMapping("/supply-project/list/self")
-    @PreAuthorize("hasAnyAuthority('DONATOR')")
-    public SimpleResult<Map<SupplyProjectStatusEnum, List<SupplyProjectDTO>>> getAllSupplyProjectByAccount() {
-        return SimpleResult.success(supplyProjectService.allSupplyProjectByAccount(GlobalAuthUtil.authedAccount()));
+    @ApiOperation("查询 捐赠项目列表")
+    @GetMapping("/supply-project/list")
+    public SimpleResult<Map<SupplyProjectStatusEnum, List<SupplyProjectDTO>>> getList(@RequestParam SupplyProjectListQueryTypeEnum type,
+                                                                                      @RequestParam(required = false) Long demandId) {
+        if (type == SupplyProjectListQueryTypeEnum.SELF) {
+            return SimpleResult.success(supplyProjectService.allSupplyProjectByAccount(GlobalAuthUtil.authedAccount()));
+        } else if (type == SupplyProjectListQueryTypeEnum.DEMAND) {
+            return SimpleResult.success(supplyProjectService.allSupplyProjectByDemand(demandService.findByIdAccount(demandId, GlobalAuthUtil.authedAccount())));
+        }
+        throw new CommonSysException(AidTrackerCommonErrorCode.INVALID_PARAM.getErrorCode(), "非法的查询类型");
     }
 
     @ApiOperation("受捐方同意捐赠一个项目")
     @PostMapping("/supply-project/grantee-agree")
     @PreAuthorize("hasAnyAuthority('GRANTEE')")
-    public SimpleResult<String> granteeAgree(@RequestBody long supplyProjectId) {
+    public SimpleResult<String> granteeAgree(@RequestBody Long supplyProjectId) {
         supplyProjectService.granteeAgree(supplyProjectId, GlobalAuthUtil.authedAccount());
         return SimpleResult.ok();
     }

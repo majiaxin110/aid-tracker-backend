@@ -11,10 +11,7 @@ import org.aidtracker.backend.domain.supply.DeliverPeriod;
 import org.aidtracker.backend.domain.supply.DeliverPeriodTypeEnum;
 import org.aidtracker.backend.domain.supply.SupplyProject;
 import org.aidtracker.backend.domain.supply.SupplyProjectLog;
-import org.aidtracker.backend.web.dto.DeliverPeriodDTO;
-import org.aidtracker.backend.web.dto.ExpressHistoryDTO;
-import org.aidtracker.backend.web.dto.SupplyProjectAllLogDTO;
-import org.aidtracker.backend.web.dto.SupplyProjectTrackDTO;
+import org.aidtracker.backend.web.dto.*;
 import org.aidtracker.backend.web.service.express.IExpressQueryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -53,18 +50,10 @@ public class SupplyProjectTrackService {
         SupplyProject supplyProject = supplyProjectService.findProjectByIdAccount(supplyProjectId, account);
         List<SupplyProjectLog> allLog = supplyProjectLogRepository.findAllBySupplyProjectId(supplyProjectId);
         SupplyProjectAllLogDTO result = new SupplyProjectAllLogDTO();
-        List<SupplyProjectAllLogDTO.LogInfo> allLogDTO = allLog.stream()
+        List<SupplyProjectLogDTO> allLogDTO = allLog.stream()
                 .sorted(Comparator.comparing(SupplyProjectLog::getTime))
-                .map(eachLog -> {
-                    SupplyProjectAllLogDTO.LogInfo logDTO = new SupplyProjectAllLogDTO.LogInfo();
-                    logDTO.setLogId(eachLog.getLogId());
-                    logDTO.setFiles(eachLog.getFileIds().stream().map(cosFileService::getById).collect(Collectors.toList()));
-                    logDTO.setInfo(eachLog.getInfo());
-                    logDTO.setLogType(eachLog.getLogType());
-                    logDTO.setSupplyProjectId(supplyProjectId);
-                    logDTO.setTime(eachLog.getTime());
-                    return logDTO;
-                }).collect(Collectors.toList());
+                .map(eachLog -> SupplyProjectLogDTO.fromSupplyProjectLog(eachLog, cosFileService.getByIdList(eachLog.getFileIds())))
+                .collect(Collectors.toList());
         result.setSupplyProjectId(supplyProjectId);
         result.setLogs(allLogDTO);
         return result;

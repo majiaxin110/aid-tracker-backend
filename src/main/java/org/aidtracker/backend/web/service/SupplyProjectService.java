@@ -36,14 +36,17 @@ public class SupplyProjectService {
 
     private final AccountService accountService;
 
+    private final CosFileService cosFileService;
+
     @Autowired
     public SupplyProjectService(SupplyProjectRepository supplyProjectRepository, SupplyProjectLogRepository supplyProjectLogRepository,
-                                DemandRepository demandRepository, DeliverPeriodRepository deliverPeriodRepository, AccountService accountService) {
+                                DemandRepository demandRepository, DeliverPeriodRepository deliverPeriodRepository, AccountService accountService, CosFileService cosFileService) {
         this.supplyProjectRepository = supplyProjectRepository;
         this.supplyProjectLogRepository = supplyProjectLogRepository;
         this.demandRepository = demandRepository;
         this.deliverPeriodRepository = deliverPeriodRepository;
         this.accountService = accountService;
+        this.cosFileService = cosFileService;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -89,9 +92,9 @@ public class SupplyProjectService {
     public SupplyProjectDTO getById(long supplyProjectId, Account account) {
         SupplyProject supplyProject = findProjectByIdAccount(supplyProjectId, account);
         if (supplyProject.getAccountId() == account.getAccountId()) {
-            return SupplyProjectDTO.fromSupplyProject(supplyProject, account);
+            return SupplyProjectDTO.fromSupplyProject(supplyProject, recentLog(supplyProject), account);
         } else {
-            return SupplyProjectDTO.fromSupplyProject(supplyProject, accountService.getById(supplyProject.getAccountId()));
+            return SupplyProjectDTO.fromSupplyProject(supplyProject, recentLog(supplyProject), accountService.getById(supplyProject.getAccountId()));
         }
     }
 
@@ -99,6 +102,18 @@ public class SupplyProjectService {
         return supplyProjectRepository.findAllByAccountId(account.getAccountId()).stream()
                 .sorted(Comparator.comparing(SupplyProject::getApplyTime).reversed())
                 .map(s -> SupplyProjectDTO.fromSupplyProject(s, account))
+                .collect(Collectors.groupingBy(SupplyProjectDTO::getStatus, Collectors.toList()));
+    }
+
+    /**
+     * 某个需求的全部相关项目，按项目状态分隔
+     * @param demand
+     * @return
+     */
+    public Map<SupplyProjectStatusEnum, List<SupplyProjectDTO>> allSupplyProjectByDemand(Demand demand) {
+        return supplyProjectRepository.findAllByDemandId(demand.getDemandId()).stream()
+                .sorted(Comparator.comparing(SupplyProject::getApplyTime).reversed())
+                .map(s -> SupplyProjectDTO.fromSupplyProject(s, recentLog(s), accountService.getById(s.getAccountId())))
                 .collect(Collectors.groupingBy(SupplyProjectDTO::getStatus, Collectors.toList()));
     }
 
@@ -189,6 +204,14 @@ public class SupplyProjectService {
             throw new CommonSysException(AidTrackerCommonErrorCode.FORBIDDEN.getErrorCode(), "无该项目权限");
         }
         return demand;
+    }
+
+
+    private SupplyProjectLogDTO recentLog(SupplyProject supplyProject) {
+        List<SupplyProjectLog> allLog = supplyProjectLogRepository.findAllBySupplyProjectId(supplyProject.getSupplyProjectId());
+        return allLog.stream().max(Comparator.comparing(SupplyProjectLog::getTime))
+                .map(l -> SupplyProjectLogDTO.fromSupplyProjectLog(l, cosFileService.getByIdList(l.getFileIds())))
+                .orElse(null);
     }
 
 }

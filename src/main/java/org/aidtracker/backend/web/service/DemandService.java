@@ -12,7 +12,7 @@ import org.aidtracker.backend.util.CommonSysException;
 import org.aidtracker.backend.web.dto.DemandCreateRequest;
 import org.aidtracker.backend.web.dto.DemandDTO;
 import org.aidtracker.backend.web.dto.DemandUpdateRequest;
-import org.aidtracker.backend.web.dto.DemandWithSupplyDTO;
+import org.aidtracker.backend.web.dto.DemandWithSupplyCountDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -73,10 +73,7 @@ public class DemandService {
      * @return
      */
     public DemandDTO update(DemandUpdateRequest request, Account account) {
-        Demand demand = demandRepository.findByDemandIdAndAccountId(request.getDemandId(), account.getAccountId());
-        if (Objects.isNull(demand)) {
-            throw new CommonSysException(AidTrackerCommonErrorCode.INVALID_PARAM.getErrorCode(), "不存在的需求id");
-        }
+        Demand demand = findByIdAccount(request.getDemandId(), account);
 
         demand.setAccountId(account.getAccountId());
         demand.setTopic(request.getTopic());
@@ -105,12 +102,12 @@ public class DemandService {
      * @param account
      * @return 按需求状态分
      */
-    public Map<DemandStatusEnum, List<DemandWithSupplyDTO>> allDemandByAccount(Account account) {
+    public Map<DemandStatusEnum, List<DemandWithSupplyCountDTO>> allDemandByAccount(Account account) {
         List<Demand> allDemand = demandRepository.findAllByAccountId(account.getAccountId());
         return allDemand.stream()
                 .filter(demand -> demand.getStatus() != DemandStatusEnum.CLOSED)
                 .sorted(Comparator.comparing(Demand::getPublishTime).reversed())
-                .map(this::buildDemandWithSupplyProjectInfo)
+                .map(this::buildDemandWithSupplyProjectCount)
                 .collect(Collectors.groupingBy(dto -> dto.getDemand().getStatus(), Collectors.toList()));
     }
 
@@ -119,11 +116,16 @@ public class DemandService {
                 new CommonSysException(AidTrackerCommonErrorCode.NOT_FOUND.getErrorCode(), "未找到对应需求"));
     }
 
-    private DemandWithSupplyDTO buildDemandWithSupplyProjectInfo(Demand demand) {
+    public Demand findByIdAccount(long demandId, Account granteeAccount) {
+        return demandRepository.findByDemandIdAndAccountId(demandId, granteeAccount.getAccountId())
+                .orElseThrow(() -> new CommonSysException(AidTrackerCommonErrorCode.INVALID_PARAM.getErrorCode(), "不存在的需求id"));
+    }
+
+    private DemandWithSupplyCountDTO buildDemandWithSupplyProjectCount(Demand demand) {
         List<SupplyProject> allSupplyProject = supplyProjectRepository.findAllByDemandId(demand.getDemandId());
         Map<SupplyProjectStatusEnum, Long> supplyProjectCount = allSupplyProject.stream()
                 .collect(Collectors.groupingBy(SupplyProject::getStatus, Collectors.counting()));
-        return DemandWithSupplyDTO.fromDemand(demand, supplyProjectCount);
+        return DemandWithSupplyCountDTO.fromDemand(demand, supplyProjectCount);
     }
 
 }
