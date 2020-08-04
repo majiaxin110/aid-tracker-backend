@@ -30,8 +30,10 @@ public class DemandController {
     @ApiOperation("开放接口 全部需求列表")
     @GetMapping("/public/demand/list")
     public SimpleResult<Page<DemandDTO>> getAllDemand(@RequestParam(required = false, defaultValue = "0") int page,
-                                                      @RequestParam(required = false, defaultValue = "10") int size) {
-        return SimpleResult.success(demandService.allDemand(PageRequest.of(page, size)));
+                                                      @RequestParam(required = false, defaultValue = "10") int size,
+                                                      @RequestParam(required = false, defaultValue = "DEFAULT") PublicDemandListQueryTypeEnum type
+                                                      ) {
+        return SimpleResult.success(demandService.allDemand(page, size, type));
     }
 
     @ApiOperation("需求列表查询")

@@ -9,17 +9,22 @@ import org.aidtracker.backend.domain.supply.SupplyProject;
 import org.aidtracker.backend.domain.supply.SupplyProjectStatusEnum;
 import org.aidtracker.backend.util.AidTrackerCommonErrorCode;
 import org.aidtracker.backend.util.CommonSysException;
-import org.aidtracker.backend.web.dto.DemandCreateRequest;
-import org.aidtracker.backend.web.dto.DemandDTO;
-import org.aidtracker.backend.web.dto.DemandUpdateRequest;
-import org.aidtracker.backend.web.dto.DemandWithSupplyCountDTO;
+import org.aidtracker.backend.web.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -100,11 +105,25 @@ public class DemandService {
     /**
      * 全部需求列表
      * TODO：排序方式
-     * @param pageable
      * @return
      */
-    public Page<DemandDTO> allDemand(Pageable pageable) {
-        return demandRepository.findAll(pageable).map(DemandDTO::fromDemand);
+    public Page<DemandDTO> allDemand(int page, int size, PublicDemandListQueryTypeEnum queryType) {
+        Specification<Demand> querySpec = new Specification<Demand>() {
+            @Override
+            public Predicate toPredicate(Root<Demand> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+                List<Predicate> predicateList = new ArrayList<>();
+                if (queryType == PublicDemandListQueryTypeEnum.DEFAULT) {
+                    predicateList.add(criteriaBuilder.notEqual(root.get("status"), DemandStatusEnum.CLOSED));
+                }
+                return criteriaBuilder.and(predicateList.toArray(new Predicate[0]));
+            }
+        };
+        // md jpa这种传property string的设计真的大丈夫？
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("publishTime").descending());
+
+
+        return demandRepository.findAll(querySpec, pageRequest).map(DemandDTO::fromDemand);
+
     }
 
     /**
