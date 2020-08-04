@@ -1,6 +1,8 @@
 package org.aidtracker.backend.dao.util;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
 
 import javax.persistence.AttributeConverter;
 import java.util.List;
@@ -14,12 +16,12 @@ public class SimpleStringListConverter implements AttributeConverter<List<Long>,
 
     @Override
     public String convertToDatabaseColumn(List<Long> attribute) {
-        return attribute == null ? null : attribute.stream().map(Object::toString).collect(Collectors.joining(","));
+        return CollectionUtils.isEmpty(attribute) ? null : attribute.stream().map(Object::toString).collect(Collectors.joining(","));
     }
 
     @Override
     public List<Long> convertToEntityAttribute(String dbData) {
-        return dbData == null ? null : Lists.newArrayList(dbData.split(",")).stream().map(Long::parseLong)
-                .collect(Collectors.toList());
+        return StringUtils.isBlank(dbData) ? Lists.newArrayList() : Lists.newArrayList(dbData.split(","))
+                .stream().map(Long::parseLong).collect(Collectors.toList());
     }
 }

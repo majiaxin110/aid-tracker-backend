@@ -4,10 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.aidtracker.backend.dao.*;
 import org.aidtracker.backend.domain.account.Account;
 import org.aidtracker.backend.domain.demand.Demand;
-import org.aidtracker.backend.domain.supply.DeliverPeriod;
-import org.aidtracker.backend.domain.supply.SupplyProject;
-import org.aidtracker.backend.domain.supply.SupplyProjectLog;
-import org.aidtracker.backend.domain.supply.SupplyProjectStatusEnum;
+import org.aidtracker.backend.domain.supply.*;
 import org.aidtracker.backend.util.AidTrackerCommonErrorCode;
 import org.aidtracker.backend.util.CommonSysException;
 import org.aidtracker.backend.web.dto.*;
@@ -49,6 +46,7 @@ public class SupplyProjectService {
         this.accountService = accountService;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public SupplyProjectDTO create(SupplyProjectCreateRequest request, Account account) {
         SupplyProject supplyProject = new SupplyProject();
         supplyProject.setAccountId(account.getAccountId());
@@ -63,6 +61,9 @@ public class SupplyProjectService {
         supplyProject.setComment(request.getComment());
 
         supplyProject = supplyProjectRepository.save(supplyProject);
+
+        SupplyProjectLog projectLog = SupplyProjectLog.of(supplyProject, SupplyProjectLogTypeEnum.DONATE_SUBMIT);
+        supplyProjectLogRepository.save(projectLog);
 
         return SupplyProjectDTO.fromSupplyProject(supplyProject, account);
     }

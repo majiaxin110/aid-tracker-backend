@@ -1,7 +1,9 @@
 package org.aidtracker.backend;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.extern.slf4j.Slf4j;
 import org.aidtracker.backend.dao.AccountRepository;
 import org.aidtracker.backend.domain.account.Account;
@@ -64,12 +66,7 @@ public class AccountEnvBaseTest extends BaseTest {
         testDonatorAccount = saveTestAccount(testDonatorAccount);
         testGranteeAccount = saveTestAccount(testGranteeAccount);
 
-        when(wechatAuthService.auth(anyString())).thenReturn(testDonatorOpenId);
-
-        UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(testDonatorAccount, null,
-                        List.of(new SimpleGrantedAuthority(AccountRoleEnum.DONATOR.name())));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        setUpDonatorEnv();
     }
 
     public void setUpGranteeEnv() {
@@ -99,7 +96,7 @@ public class AccountEnvBaseTest extends BaseTest {
 //    }
 
     public void printResult(Object object) throws JsonProcessingException {
-        log.warn(objectMapper.writeValueAsString(object));
+        log.warn("RESULT: " + objectMapper.writeValueAsString(object));
     }
 
     public void checkAndPrint(SimpleResult<?> result) throws JsonProcessingException {

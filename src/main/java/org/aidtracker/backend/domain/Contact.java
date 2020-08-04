@@ -1,6 +1,7 @@
 package org.aidtracker.backend.domain;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -18,6 +19,7 @@ import javax.persistence.Enumerated;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Contact {
     /**
      * 联系人姓名
