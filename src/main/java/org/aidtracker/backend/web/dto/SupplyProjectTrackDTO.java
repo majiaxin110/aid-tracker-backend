@@ -17,6 +17,6 @@ public class SupplyProjectTrackDTO {
 
     private List<DeliverPeriodDTO> deliverPeriods;
 
-    @ApiModelProperty("快递物流追踪 追踪有快递信息的最近环节")
+    @ApiModelProperty("快递物流追踪 追踪有快递信息的最近环节；当没有有效快递信息时，该字段为null")
     private ExpressHistoryDTO expressHistory;
 }

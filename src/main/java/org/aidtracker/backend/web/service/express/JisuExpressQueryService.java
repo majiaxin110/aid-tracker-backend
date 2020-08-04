@@ -7,9 +7,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.aidtracker.backend.util.AidTrackerCommonErrorCode;
 import org.aidtracker.backend.util.CommonSysException;
 import org.aidtracker.backend.web.dto.ExpressHistoryDTO;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -48,19 +50,22 @@ public class JisuExpressQueryService implements IExpressQueryService {
     }
 
     @Override
-    public ExpressHistoryDTO query(String trackingNum) {
+    public ExpressHistoryDTO query(String trackingNum, String phoneNum) {
         URI uri = UriComponentsBuilder.fromUriString(url)
                 .queryParam("type", type)
                 .queryParam("appkey", appkey)
                 .queryParam("number", trackingNum)
+                .queryParam("mobile", phoneNum)
                 .build().toUri();
-        String infoStr = restTemplate.getForObject(uri, String.class);
+
         ExpressHistoryDTO result = new ExpressHistoryDTO();
+        result.setValid(false);
         result.setTrackingNum(trackingNum);
         try {
+            String infoStr = restTemplate.getForObject(uri, String.class);
+
             JsonNode infoJson = objectMapper.readTree(infoStr);
             if (!infoJson.get(JISU_MSG).asText().equalsIgnoreCase(JISU_OK)) {
-                result.setValid(false);
                 return result;
             }
             result.setValid(true);
@@ -75,9 +80,23 @@ public class JisuExpressQueryService implements IExpressQueryService {
                 historyList.add(historyInfo);
             });
             result.setList(historyList);
+            return result;
+        } catch (RestClientException e) {
+            log.error("调用极速快递接口失败", e);
+            return result;
         } catch (JsonProcessingException e) {
-            throw new CommonSysException(AidTrackerCommonErrorCode.SYSTEM_ERROR.getErrorCode(), "无效的物流接口信息" + infoStr);
+            throw new CommonSysException(AidTrackerCommonErrorCode.SYSTEM_ERROR.getErrorCode(),
+                    "无效的物流接口信息 trackingNum:" + trackingNum);
         }
-        return result;
+    }
+
+    /**
+     * 是否是顺丰快递
+     *
+     * @param trackingNum
+     * @return
+     */
+    private boolean isSFExpress(String trackingNum) {
+        return StringUtils.startsWithIgnoreCase(trackingNum, "SF");
     }
 }

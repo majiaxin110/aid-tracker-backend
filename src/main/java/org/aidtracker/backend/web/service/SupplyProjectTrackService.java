@@ -4,7 +4,9 @@ import com.google.common.collect.Lists;
 import org.aidtracker.backend.dao.DeliverPeriodRepository;
 import org.aidtracker.backend.dao.SupplyProjectLogRepository;
 import org.aidtracker.backend.dao.SupplyProjectRepository;
+import org.aidtracker.backend.domain.Contact;
 import org.aidtracker.backend.domain.account.Account;
+import org.aidtracker.backend.domain.demand.Demand;
 import org.aidtracker.backend.domain.supply.DeliverPeriod;
 import org.aidtracker.backend.domain.supply.DeliverPeriodTypeEnum;
 import org.aidtracker.backend.domain.supply.SupplyProject;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -32,15 +35,17 @@ public class SupplyProjectTrackService {
     private final SupplyProjectService supplyProjectService;
     private final CosFileService cosFileService;
     private final IExpressQueryService expressQueryService;
+    private final DemandService demandService;
     private final DeliverPeriodRepository deliverPeriodRepository;
 
     @Autowired
-    public SupplyProjectTrackService(SupplyProjectRepository supplyProjectRepository, SupplyProjectLogRepository supplyProjectLogRepository, SupplyProjectService supplyProjectService, CosFileService cosFileService, IExpressQueryService expressQueryService, DeliverPeriodRepository deliverPeriodRepository) {
+    public SupplyProjectTrackService(SupplyProjectRepository supplyProjectRepository, SupplyProjectLogRepository supplyProjectLogRepository, SupplyProjectService supplyProjectService, CosFileService cosFileService, IExpressQueryService expressQueryService, DemandService demandService, DeliverPeriodRepository deliverPeriodRepository) {
         this.supplyProjectRepository = supplyProjectRepository;
         this.supplyProjectLogRepository = supplyProjectLogRepository;
         this.supplyProjectService = supplyProjectService;
         this.cosFileService = cosFileService;
         this.expressQueryService = expressQueryService;
+        this.demandService = demandService;
         this.deliverPeriodRepository = deliverPeriodRepository;
     }
 
@@ -71,11 +76,14 @@ public class SupplyProjectTrackService {
         SupplyProjectTrackDTO result = new SupplyProjectTrackDTO();
         result.setSupplyProjectId(supplyProjectId);
         result.setDeliverPeriods(allDeliverPeriod.stream().map(DeliverPeriodDTO::fromDeliverPeriod).collect(Collectors.toList()));
+        Demand demand = demandService.findById(supplyProject.getDemandId());
+        // 从收货人/寄件人信息中提取手机号
+        String phoneNum = Contact.getPhoneNumFromList(List.of(supplyProject.getContact(), demand.getContact()));
         for (DeliverPeriod eachPeriod : Lists.reverse(allDeliverPeriod)) {
             if (eachPeriod.getPeriodType() != DeliverPeriodTypeEnum.EXPRESS) {
                 continue;
             }
-            ExpressHistoryDTO expressHistoryDTO = expressQueryService.query(eachPeriod.getTrackingNum());
+            ExpressHistoryDTO expressHistoryDTO = expressQueryService.query(eachPeriod.getTrackingNum(), phoneNum);
             if (expressHistoryDTO.getValid()) {
                 result.setExpressHistory(expressHistoryDTO);
             }

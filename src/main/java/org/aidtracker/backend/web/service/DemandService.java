@@ -114,6 +114,11 @@ public class DemandService {
                 .collect(Collectors.groupingBy(dto -> dto.getDemand().getStatus(), Collectors.toList()));
     }
 
+    public Demand findById(long demandId) {
+        return demandRepository.findById(demandId).orElseThrow(() ->
+                new CommonSysException(AidTrackerCommonErrorCode.NOT_FOUND.getErrorCode(), "未找到对应需求"));
+    }
+
     private DemandWithSupplyDTO buildDemandWithSupplyProjectInfo(Demand demand) {
         List<SupplyProject> allSupplyProject = supplyProjectRepository.findAllByDemandId(demand.getDemandId());
         Map<SupplyProjectStatusEnum, Long> supplyProjectCount = allSupplyProject.stream()

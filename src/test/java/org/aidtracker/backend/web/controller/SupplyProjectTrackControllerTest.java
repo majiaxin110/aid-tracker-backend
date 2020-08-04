@@ -42,6 +42,7 @@ class SupplyProjectTrackControllerTest extends AccountEnvBaseTest {
     private SupplyProject supplyProject;
 
     private final String VALID_EXPRESS_NUM = "75359661708153";
+    private final String VALID_SFEXPRESS_NUM = "SF1025485543588";
 
     @BeforeEach
     void setUpSupplyProject() {
@@ -89,6 +90,25 @@ class SupplyProjectTrackControllerTest extends AccountEnvBaseTest {
         deliverPeriodInfoList.add(DispatchRequest.DeliverPeriodInfo.builder()
                 .periodType(DeliverPeriodTypeEnum.DIY)
                 .contact(Contact.builder().contactName("终末人").contactInfo("120").type(ContactTypeEnum.PHONE).build())
+                .build());
+        dispatchRequest.setDeliverPeriodList(deliverPeriodInfoList);
+
+        setUpDonatorEnv();
+        supplyProjectController.donatorDispatch(dispatchRequest);
+
+        SimpleResult<SupplyProjectTrackDTO> result = supplyProjectTrackController.trackExpress(supplyProject.getSupplyProjectId());
+        checkAndPrint(result);
+    }
+
+    @Test
+    void trackSFExpress() throws JsonProcessingException {
+        DispatchRequest dispatchRequest = new DispatchRequest();
+        dispatchRequest.setSupplyProjectId(supplyProject.getSupplyProjectId());
+
+        List<DispatchRequest.DeliverPeriodInfo> deliverPeriodInfoList = new ArrayList<>();
+        deliverPeriodInfoList.add(DispatchRequest.DeliverPeriodInfo.builder()
+                .periodType(DeliverPeriodTypeEnum.EXPRESS)
+                .trackingNum(VALID_SFEXPRESS_NUM)
                 .build());
         dispatchRequest.setDeliverPeriodList(deliverPeriodInfoList);
 
