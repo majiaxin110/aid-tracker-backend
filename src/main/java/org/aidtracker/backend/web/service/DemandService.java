@@ -23,7 +23,6 @@ import java.time.ZonedDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -85,6 +84,17 @@ public class DemandService {
 
         demand = demandRepository.save(demand);
         return DemandDTO.fromDemand(demand);
+    }
+
+    /**
+     * 简单关闭一个需求
+     * @param demandId
+     * @param account
+     */
+    public void close(long demandId, Account account) {
+        Demand demand = findById(demandId);
+        demand.close(account);
+        demandRepository.save(demand);
     }
 
     /**

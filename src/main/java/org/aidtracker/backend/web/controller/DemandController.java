@@ -37,7 +37,7 @@ public class DemandController {
     @ApiOperation("需求列表查询")
     @GetMapping("/demand/list")
     @PreAuthorize("hasAnyAuthority('GRANTEE')")
-    public SimpleResult<Map<DemandStatusEnum, List<DemandWithSupplyCountDTO>>> getAllDemandByAccount(@RequestParam DemandListQueryTypeEnum type) {
+    public SimpleResult<Map<DemandStatusEnum, List<DemandWithSupplyCountDTO>>> getDemandList(@RequestParam(defaultValue = "SELF") DemandListQueryTypeEnum type) {
         return SimpleResult.success(demandService.allDemandByAccount(GlobalAuthUtil.authedAccount()));
     }
 
@@ -54,6 +54,14 @@ public class DemandController {
     @PreAuthorize("hasAnyAuthority('GRANTEE')")
     public SimpleResult<DemandDTO> update(@RequestBody @ApiParam("DemandUpdateRequest") DemandUpdateRequest request) {
         return SimpleResult.success(demandService.update(request, GlobalAuthUtil.authedAccount()));
+    }
+
+    @ApiOperation("关闭需求")
+    @DeleteMapping("/demand")
+    @PreAuthorize("hasAnyAuthority('GRANTEE')")
+    public SimpleResult<String> delete(@RequestParam Long demandId) {
+        demandService.close(demandId, GlobalAuthUtil.authedAccount());
+        return SimpleResult.ok();
     }
 
 }
