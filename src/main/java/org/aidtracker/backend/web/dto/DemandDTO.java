@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.aidtracker.backend.domain.Contact;
 import org.aidtracker.backend.domain.DeliverAddress;
+import org.aidtracker.backend.domain.account.Account;
 import org.aidtracker.backend.domain.demand.Demand;
 import org.aidtracker.backend.domain.demand.DemandStatusEnum;
 
@@ -22,6 +23,9 @@ public class DemandDTO {
 
     @ApiModelProperty("发布者id")
     private Long accountId;
+
+    @ApiModelProperty("发布者信息")
+    private AccountSimpleDTO account;
 
     private String topic;
 
@@ -65,5 +69,11 @@ public class DemandDTO {
         demandDTO.setContact(demand.getContact());
         demandDTO.setComment(demand.getComment());
         return demandDTO;
+    }
+
+    public static DemandDTO fromDemandAccount(Demand demand, Account publisher) {
+        DemandDTO result = fromDemand(demand);
+        result.setAccount(AccountSimpleDTO.fromAccount(publisher));
+        return result;
     }
 }

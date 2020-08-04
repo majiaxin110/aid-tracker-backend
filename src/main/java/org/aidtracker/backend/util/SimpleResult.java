@@ -19,9 +19,9 @@ public class SimpleResult<T> implements Serializable {
     /**
      * 该errorCode旨在满足规范错误码的需要，与Http状态码并不冲突
      */
-    private String errorCode = StringUtils.EMPTY;
+    private String errorCode;
 
-    private String errorMsg = StringUtils.EMPTY;
+    private String errorMsg;
 
     private Boolean success;
 

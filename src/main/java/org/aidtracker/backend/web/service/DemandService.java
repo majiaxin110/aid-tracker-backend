@@ -10,10 +10,11 @@ import org.aidtracker.backend.domain.supply.SupplyProjectStatusEnum;
 import org.aidtracker.backend.util.AidTrackerCommonErrorCode;
 import org.aidtracker.backend.util.CommonSysException;
 import org.aidtracker.backend.web.dto.*;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -38,11 +39,13 @@ import java.util.stream.Collectors;
 public class DemandService {
     private final DemandRepository demandRepository;
     private final SupplyProjectRepository supplyProjectRepository;
+    private final AccountService accountService;
 
     @Autowired
-    public DemandService(DemandRepository demandRepository, SupplyProjectRepository supplyProjectRepository) {
+    public DemandService(DemandRepository demandRepository, SupplyProjectRepository supplyProjectRepository, AccountService accountService) {
         this.demandRepository = demandRepository;
         this.supplyProjectRepository = supplyProjectRepository;
+        this.accountService = accountService;
     }
 
     /**
@@ -104,10 +107,16 @@ public class DemandService {
 
     /**
      * 全部需求列表
-     * TODO：排序方式
+     *
      * @return
      */
-    public Page<DemandDTO> allDemand(int page, int size, PublicDemandListQueryTypeEnum queryType) {
+    public Page<DemandDTO> allDemand(int page, int size, PublicDemandListQueryTypeEnum queryType, BigDecimal lat, BigDecimal lon) {
+        if (queryType == PublicDemandListQueryTypeEnum.LOCATION) {
+            if (ObjectUtils.anyNull(lon, lat)) {
+                throw new CommonSysException(AidTrackerCommonErrorCode.INVALID_PARAM.getErrorCode(),
+                        "按距离排序时必须传递位置参数");
+            }
+        }
         Specification<Demand> querySpec = new Specification<Demand>() {
             @Override
             public Predicate toPredicate(Root<Demand> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
@@ -118,12 +127,18 @@ public class DemandService {
                 return criteriaBuilder.and(predicateList.toArray(new Predicate[0]));
             }
         };
-        // md jpa这种传property string的设计真的大丈夫？
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("publishTime").descending());
 
+        Page<Demand> resultPageable;
+        if (queryType != PublicDemandListQueryTypeEnum.LOCATION) {
+            // md jpa这种传property string的设计真的大丈夫？
+            resultPageable = demandRepository.findAll(querySpec, PageRequest.of(page, size, Sort.by("publishTime").descending()));
+        } else {
+            // 经纬度排序目前交给mysql做了
+            List<Demand> demandList = demandRepository.findAll(DemandStatusEnum.CLOSED.name(), lat, lon, page, size);
+            resultPageable = new PageImpl<>(demandList, PageRequest.of(page, size), demandRepository.countByStatusNot(DemandStatusEnum.CLOSED));
+        }
 
-        return demandRepository.findAll(querySpec, pageRequest).map(DemandDTO::fromDemand);
-
+        return resultPageable.map(d -> DemandDTO.fromDemandAccount(d, accountService.getById(d.getAccountId())));
     }
 
     /**

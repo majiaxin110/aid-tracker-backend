@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -31,9 +32,11 @@ public class DemandController {
     @GetMapping("/public/demand/list")
     public SimpleResult<Page<DemandDTO>> getAllDemand(@RequestParam(required = false, defaultValue = "0") int page,
                                                       @RequestParam(required = false, defaultValue = "10") int size,
-                                                      @RequestParam(required = false, defaultValue = "DEFAULT") PublicDemandListQueryTypeEnum type
+                                                      @RequestParam(required = false, defaultValue = "DEFAULT") PublicDemandListQueryTypeEnum type,
+                                                      @RequestParam(required = false, defaultValue = "39.92") @ApiParam(value = "纬度 按距离排序时必需", example = "39.92") BigDecimal lat,
+                                                      @RequestParam(required = false, defaultValue = "116.46") @ApiParam(value = "经度 按距离排序时必需", example = "116.46") BigDecimal lon
                                                       ) {
-        return SimpleResult.success(demandService.allDemand(page, size, type));
+        return SimpleResult.success(demandService.allDemand(page, size, type, lat, lon));
     }
 
     @ApiOperation("需求列表查询")

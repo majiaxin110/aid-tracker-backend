@@ -51,7 +51,8 @@ class SupplyProjectControllerTest extends AccountEnvBaseTest {
         Goods goods = new Goods("手办", "精品233", "万代", "个");
         SupplyProjectCreateRequest request = new SupplyProjectCreateRequest();
         request.setGoods(goods);
-        request.setAddress(new DeliverAddress("200000", "上海黄浦江"));
+        request.setAddress(DeliverAddress.builder().deliverZipCode("200000")
+                .deliverAddressInfo("上海黄浦江").build());
         request.setDemandId(1L);
         request.setDeliverMethod(SupplyDeliverMethodEnum.DONATOR);
         request.setAmount(BigDecimal.TEN);
@@ -76,7 +77,8 @@ class SupplyProjectControllerTest extends AccountEnvBaseTest {
         Goods goods = new Goods("蓝光盘", "BD", "Kyoto Animation", "套");
         SupplyProjectCreateRequest request = new SupplyProjectCreateRequest();
         request.setGoods(goods);
-        request.setAddress(new DeliverAddress("200000", "上海黄浦江"));
+        request.setAddress(DeliverAddress.builder().deliverZipCode("200000")
+                .deliverAddressInfo("上海黄浦江旁边").build());
         request.setDemandId(2L);
         request.setDeliverMethod(SupplyDeliverMethodEnum.DONATOR);
         request.setAmount(BigDecimal.TEN);
@@ -99,7 +101,8 @@ class SupplyProjectControllerTest extends AccountEnvBaseTest {
         Goods goods = new Goods("蓝光盘", "BD", "Kyoto Animation", "套");
         SupplyProjectCreateRequest request = new SupplyProjectCreateRequest();
         request.setGoods(goods);
-        request.setAddress(new DeliverAddress("200000", "上海黄浦江"));
+        request.setAddress(DeliverAddress.builder().deliverZipCode("200000")
+                .deliverAddressInfo("上海黄浦江里面").build());
         request.setDemandId(2L);
         request.setDeliverMethod(SupplyDeliverMethodEnum.DONATOR);
         request.setAmount(BigDecimal.TEN);
@@ -141,7 +144,8 @@ class SupplyProjectControllerTest extends AccountEnvBaseTest {
         Goods goods = new Goods("蓝光盘", "BD", "Kyoto Animation", "套");
         SupplyProjectCreateRequest projectCreateRequest = new SupplyProjectCreateRequest();
         projectCreateRequest.setGoods(goods);
-        projectCreateRequest.setAddress(new DeliverAddress("200000", "上海黄浦江"));
+        projectCreateRequest.setAddress(DeliverAddress.builder().deliverZipCode("200000")
+                .deliverAddressInfo("上海黄浦江").build());
         projectCreateRequest.setDemandId(2L);
         projectCreateRequest.setDeliverMethod(SupplyDeliverMethodEnum.DONATOR);
         projectCreateRequest.setAmount(BigDecimal.TEN);
