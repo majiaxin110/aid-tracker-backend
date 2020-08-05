@@ -1,6 +1,7 @@
 package org.aidtracker.backend.web.controller;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.aidtracker.backend.domain.CosFile;
 import org.aidtracker.backend.util.GlobalAuthUtil;
 import org.aidtracker.backend.util.SimpleResult;
@@ -22,6 +23,7 @@ public class CosFileController {
     CosFileService cosFileService;
 
     @PostMapping("/cos-file")
+    @ApiOperation("文件上传")
     public SimpleResult<CosFile> upload(MultipartFile file, @RequestParam(required = false) String comment) {
         return SimpleResult.success(cosFileService.uploadToQcloud(file, comment, GlobalAuthUtil.authedAccount()));
     }

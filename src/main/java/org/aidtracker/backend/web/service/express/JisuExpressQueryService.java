@@ -79,7 +79,7 @@ public class JisuExpressQueryService implements IExpressQueryService {
                         DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).atZone(ZoneId.systemDefault()));
                 historyList.add(historyInfo);
             });
-            result.setList(historyList);
+            result.setInfoList(historyList);
             return result;
         } catch (RestClientException e) {
             log.error("调用极速快递接口失败", e);

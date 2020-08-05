@@ -75,7 +75,7 @@ public class SupplyProjectController {
     @ApiOperation("捐赠方发货")
     @PostMapping("/supply-project/dispatch")
     @PreAuthorize("hasAnyAuthority('DONATOR')")
-    public SimpleResult<String> donatorDispatch(@RequestBody DispatchRequest request) {
+    public SimpleResult<String> donatorDispatch(@RequestBody @ApiParam("DispatchRequest") DispatchRequest request) {
         supplyProjectService.donatorDispatch(request, GlobalAuthUtil.authedAccount());
         return SimpleResult.ok();
     }
@@ -83,7 +83,7 @@ public class SupplyProjectController {
     @ApiOperation("受捐方收货")
     @PostMapping("/supply-project/grantee-received")
     @PreAuthorize("hasAnyAuthority('GRANTEE')")
-    public SimpleResult<String> granteeReceived(@RequestBody GranteeReceivedRequest request) {
+    public SimpleResult<String> granteeReceived(@RequestBody @ApiParam("GranteeReceivedRequest") GranteeReceivedRequest request) {
         supplyProjectService.granteeReceived(request, GlobalAuthUtil.authedAccount());
         return SimpleResult.ok();
     }
@@ -91,7 +91,7 @@ public class SupplyProjectController {
     @ApiOperation("受捐方提交捐献证明")
     @PostMapping("/supply-project/donate-cert")
     @PreAuthorize("hasAnyAuthority('GRANTEE')")
-    public SimpleResult<String> granteeSubmitCert(@RequestBody DonateCertRequest request) {
+    public SimpleResult<String> granteeSubmitCert(@RequestBody @ApiParam("DonateCertRequest") DonateCertRequest request) {
         supplyProjectService.granteeSubmitCert(request, GlobalAuthUtil.authedAccount());
         return SimpleResult.ok();
     }

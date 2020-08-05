@@ -3,6 +3,7 @@ package org.aidtracker.backend.web.dto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -11,6 +12,7 @@ import java.util.List;
  */
 @Data
 public class DonateCertRequest {
+    @NotNull
     private Long supplyProjectId;
 
     @ApiModelProperty("捐献证明文件id列表")

@@ -30,6 +30,7 @@ public class DispatchRequest {
         private Contact contact;
     }
 
+    @ApiModelProperty("物流阶段")
     List<DeliverPeriodInfo> deliverPeriodList;
 
     @NotNull

@@ -26,7 +26,7 @@ public class ExpressHistoryDTO {
     @ApiModelProperty("快递公司logo")
     private String logUrl;
 
-    private List<HistoryInfo> list;
+    private List<HistoryInfo> infoList;
 
     @ApiModelProperty("是否有有效的物流信息")
     private Boolean valid;

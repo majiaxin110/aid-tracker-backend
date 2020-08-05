@@ -1,5 +1,6 @@
 package org.aidtracker.backend.web.dto;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.aidtracker.backend.domain.Contact;
 import org.aidtracker.backend.domain.DeliverAddress;
@@ -15,35 +16,23 @@ import java.math.BigDecimal;
 public class DemandCreateRequest {
     private String topic;
 
-    /**
-     * 受益方描述 援助受众
-     */
+    @ApiModelProperty("受益方描述 援助受众")
     private String audiences;
 
     private Goods goods;
 
-    /**
-     * 需求数量
-     */
+    @ApiModelProperty("需求数量")
     private BigDecimal amount;
 
-    /**
-     * 寄送地址
-     */
+    @ApiModelProperty("寄送地址")
     private DeliverAddress address;
 
-    /**
-     * 自提范围信息
-     */
+    @ApiModelProperty("自提范围信息")
     private String selfTakeInfo;
 
-    /**
-     * 联系方式
-     */
+    @ApiModelProperty("联系方式")
     private Contact contact;
 
-    /**
-     * 备注
-     */
+    @ApiModelProperty("备注")
     private String comment;
 }
