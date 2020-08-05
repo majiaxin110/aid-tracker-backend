@@ -1,0 +1,39 @@
+server:
+  port: 8889
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/aidtracker?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false&zeroDateTimeBehavior=convertToNull&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    password: <mysql-pwd>
+    username: root
+  jpa:
+    database: mysql
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: false
+
+wechat:
+  auth:
+    url: https://api.weixin.qq.com/sns/jscode2session
+    app-id: <app-id>
+    secret: <secret>
+
+express:
+  jisu:
+    url: https://api.jisuapi.com/express/query
+    type: auto
+    appkey: <jisu-appkey>
+
+cos:
+  provider: qcloud
+  qcloud:
+    bucket-name: aidtracker-1253544713
+    secret-key: <qcloud-key>
+    secret-id: <qcloud-secret>
+    region: ap-shanghai
+    url-prefix: https://aidtracker-1253544713.cos.ap-shanghai.myqcloud.com/
