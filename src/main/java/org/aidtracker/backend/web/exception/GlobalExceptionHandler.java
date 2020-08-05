@@ -1,6 +1,5 @@
 package org.aidtracker.backend.web.exception;
 
-import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.aidtracker.backend.util.AidTrackerCommonErrorCode;
 import org.aidtracker.backend.util.CommonBizException;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.security.InvalidParameterException;
 import java.text.MessageFormat;
 import java.util.Map;
 
@@ -29,35 +27,27 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CommonBizException.class)
     @ResponseBody
     public SimpleResult<?> handleCommonBizException(CommonBizException ex) throws UnknownHostException {
-        Throwable rootCause = ExceptionUtils.getRootCause(ex);
-        SimpleResult<Map<Object, Object>> simpleResult = SimpleResult.fail(ex.getErrorCode(),
-                MessageFormat.format("{0} rootCauseMsg: {1} Host: {2}",
-                        ex.getMessage(), rootCause.getMessage(), InetAddress.getLocalHost().getHostName()));
-        simpleResult.setResult(Maps.newHashMap());
-        return simpleResult;
+        return generateResult(ex.getErrorCode(), ex);
     }
 
 
     @ExceptionHandler(CommonSysException.class)
     @ResponseBody
     public SimpleResult<?> handleCommonSystemException(CommonSysException ex) throws UnknownHostException {
-        Throwable rootCause = ExceptionUtils.getRootCause(ex);
-        SimpleResult<Map<Object, Object>> simpleResult = SimpleResult.fail(ex.getErrorCode(),
-                MessageFormat.format("{0} rootCauseMsg: {1} Host: {2}",
-                        ex.getMessage(), rootCause.getMessage(), InetAddress.getLocalHost().getHostName()));
-        simpleResult.setResult(Maps.newHashMap());
-        return simpleResult;
+        return generateResult(ex.getErrorCode(), ex);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseBody
     public SimpleResult<?> handleInvalidParameterException(IllegalArgumentException ex) throws UnknownHostException {
-        Throwable rootCause = ExceptionUtils.getRootCause(ex);
-        SimpleResult<Map<Object, Object>> simpleResult = SimpleResult.fail(AidTrackerCommonErrorCode.INVALID_PARAM.getErrorCode(),
+        return generateResult(AidTrackerCommonErrorCode.INVALID_PARAM.getErrorCode(), ex);
+    }
+
+    private SimpleResult<Map<Object, Object>> generateResult(String code, Exception exception) throws UnknownHostException {
+        Throwable rootCause = ExceptionUtils.getRootCause(exception);
+        return SimpleResult.fail(code,
                 MessageFormat.format("{0} rootCauseMsg: {1} Host: {2}",
-                        ex.getMessage(), rootCause.getMessage(), InetAddress.getLocalHost().getHostName()));
-        simpleResult.setResult(Maps.newHashMap());
-        return simpleResult;
+                        exception.getMessage(), rootCause.getMessage(), InetAddress.getLocalHost().getHostName()));
     }
 
 }

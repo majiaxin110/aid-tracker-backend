@@ -6,6 +6,7 @@ import org.aidtracker.backend.domain.DeliverAddress;
 import org.aidtracker.backend.domain.Goods;
 import org.aidtracker.backend.domain.supply.SupplyDeliverMethodEnum;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 /**
@@ -14,6 +15,7 @@ import java.math.BigDecimal;
  */
 @Data
 public class SupplyProjectCreateRequest {
+    @NotNull
     private Long demandId;
 
     private Goods goods;
