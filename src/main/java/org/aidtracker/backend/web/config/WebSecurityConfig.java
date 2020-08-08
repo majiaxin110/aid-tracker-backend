@@ -19,10 +19,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-    @Autowired
-    JwtAuthTokenFilter jwtAuthTokenFilter;
+    final JwtAuthTokenFilter jwtAuthTokenFilter;
 
     public static final String[] SWAGGER_RESOURCE = {"/api/doc", "/frame", "/swagger-ui.html", "/webjars/**", "/swagger-resources/**", "/v2/**"};
+
+    @Autowired
+    public WebSecurityConfig(JwtAuthTokenFilter jwtAuthTokenFilter) {
+        this.jwtAuthTokenFilter = jwtAuthTokenFilter;
+    }
 
     @Override
     public void configure(WebSecurity web) {

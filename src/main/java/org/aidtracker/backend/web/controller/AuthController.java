@@ -19,10 +19,14 @@ import java.util.Objects;
 @RestController
 @Api("认证登录")
 public class AuthController {
-    @Autowired
-    private AccountService accountService;
+    private final AccountService accountService;
 
     public static final String NEW_USER = "NEW_USER";
+
+    @Autowired
+    public AuthController(AccountService accountService) {
+        this.accountService = accountService;
+    }
 
     @PostMapping("/auth/login")
     @ApiOperation(value = "登录",

@@ -29,14 +29,18 @@ import java.util.List;
 @Component
 @Slf4j
 public class JwtAuthTokenFilter extends OncePerRequestFilter {
-    @Autowired
-    private JwtTokenUtil jwtTokenUtil;
-    @Autowired
-    private AccountRepository accountRepository;
+    private final JwtTokenUtil jwtTokenUtil;
+    private final AccountRepository accountRepository;
 
     public static final String TOKEN_HEADER_KEY = "Authorization";
     public static final String TOKEN_HEAD = "Bearer ";
     public static final String ROLE_PREFIX = "ROLE_";
+
+    @Autowired
+    public JwtAuthTokenFilter(JwtTokenUtil jwtTokenUtil, AccountRepository accountRepository) {
+        this.jwtTokenUtil = jwtTokenUtil;
+        this.accountRepository = accountRepository;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,

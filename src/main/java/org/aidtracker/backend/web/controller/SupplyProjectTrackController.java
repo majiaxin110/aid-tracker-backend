@@ -17,8 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class SupplyProjectTrackController {
+    private final SupplyProjectTrackService supplyProjectTrackService;
+
     @Autowired
-    private SupplyProjectTrackService supplyProjectTrackService;
+    public SupplyProjectTrackController(SupplyProjectTrackService supplyProjectTrackService) {
+        this.supplyProjectTrackService = supplyProjectTrackService;
+    }
 
     @GetMapping("/supply-project/log")
     @ApiOperation("单个捐赠项目的全部进程记录")

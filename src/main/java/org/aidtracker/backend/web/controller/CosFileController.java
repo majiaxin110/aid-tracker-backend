@@ -19,8 +19,12 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @Api("简单文件上传")
 public class CosFileController {
+    private final CosFileService cosFileService;
+
     @Autowired
-    CosFileService cosFileService;
+    public CosFileController(CosFileService cosFileService) {
+        this.cosFileService = cosFileService;
+    }
 
     @PostMapping("/cos-file")
     @ApiOperation("文件上传")
